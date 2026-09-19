@@ -1,0 +1,83 @@
+ros-jazzy-tobas-fc2xx-core (2.16.1-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Thu, 17 Sep 2026 15:00:00 -0000
+
+ros-jazzy-tobas-fc2xx-core (2.16.0-1bookworm) bookworm; urgency=high
+
+  * Add description
+  * 0.0.0 -> 2.16.0
+  * .
+  * コメント改善
+  * Merge branch 'feature/gcs_layout' into jazzy
+  * style: use explicit decimal literals
+  * Contributors: Masayoshi Dohi
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Tue, 28 Jul 2026 15:00:00 -0000
+
+ros-jazzy-tobas-fc2xx-core (2.15.0-1bookworm) bookworm; urgency=high
+
+  * Merge branch 'jazzy-dev' into jazzy
+  * Rotor Control Gain -> RPM Control Gain
+  * Merge branch 'jazzy-dev' into jazzy
+  * RPMフィルタのLPFカットオフを調整可能に
+  * RPMフィルタのパラメータを調整可能に
+  * .
+  * SPIクロック数を下げた: 30Mbps -> 12Mbps
+  * .
+  * Merge branch 'jazzy-dev' into jazzy
+  * 軸入れ替え
+  * fix
+  * .
+  * .
+  * fix
+  * Merge branch 'feature/fc2xx_driver' into jazzy-dev
+  * discard the first data
+  * .
+  * .
+  * .
+  * add: tobas_fc2xx_core
+  * .
+  * add dshot driver
+  * Contributors: Masayoshi Dohi
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Sun, 28 Jun 2026 15:00:00 -0000
+
+ros-jazzy-tobas-fc2xx-core (2.12.1-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Wed, 18 Feb 2026 12:13:14 +0900
+
+ros-jazzy-tobas-fc2xx-core (2.12.0-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Wed, 18 Feb 2026 12:13:14 +0900
+
+ros-jazzy-tobas-fc2xx-core (2.11.0-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Thu, 12 Feb 2026 15:00:00 -0000
+
+ros-jazzy-tobas-fc2xx-core (2.10.0-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Wed, 28 Jan 2026 15:00:00 -0000
+
+ros-jazzy-tobas-fc2xx-core (2.8.0-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Wed, 24 Sep 2025 15:00:00 -0000
+
+ros-jazzy-tobas-fc2xx-core (2.7.0-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Mon, 08 Sep 2025 15:00:00 -0000
+
+
