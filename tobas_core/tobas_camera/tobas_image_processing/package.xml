@@ -1,0 +1,24 @@
+<package format="3">
+
+	<name>tobas_image_processing</name>
+	<version>2.16.1</version>
+	<description>ROS 2 nodes for video capture, image compression, decompression, conversion, and display.</description>
+	<maintainer email="m.dohi@tobas.jp">Masayoshi Dohi</maintainer>
+	<license>GPL-3.0-or-later</license>
+
+	<buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>ffmpeg_encoder_decoder</depend>
+  <depend>ffmpeg_image_transport_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>tobas_ic_drivers</depend>
+  <depend>tobas_node</depend>
+  <depend>tobas_msgs_adapter</depend>
+  <depend>tobas_camera_ros_interface</depend>
+  <depend>tobas_camera_msgs</depend>
+
+	<export>
+		<build_type>ament_cmake</build_type>
+	</export>
+
+</package>
