@@ -1,8 +1,0 @@
-# SPDX-License-Identifier: Apache-2.0
-# Copyright (C) 2026 Tobas, Inc.
-
-float64 latitude
-float64 longitude
----
-bool success
-string message
