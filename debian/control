@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-setup-assistant
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-magic-enum, ros-jazzy-sensor-msgs, ros-jazzy-tobas-drone-msgs-adapter, ros-jazzy-tobas-git, ros-jazzy-tobas-gui-common, ros-jazzy-tobas-inja-vendor, ros-jazzy-tobas-kdl-parser, ros-jazzy-tobas-path-tools, ros-jazzy-tobas-property-client, ros-jazzy-tobas-qt-tools, ros-jazzy-tobas-rapidcsv-vendor, ros-jazzy-tobas-ros2-tools, ros-jazzy-tobas-rviz-wrapper, ros-jazzy-tobas-string-tools, ros-jazzy-tobas-uadf, ros-jazzy-tobas-urdf, ros-jazzy-tobas-visualization-msgs, ros-jazzy-tobas-xml-tools, ros-jazzy-visualization-msgs, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_setup_assistant/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-setup-assistant
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-hardware-interface, ros-jazzy-magic-enum, ros-jazzy-sensor-msgs, ros-jazzy-tobas-drone-msgs-adapter, ros-jazzy-tobas-git, ros-jazzy-tobas-gui-common, ros-jazzy-tobas-inja-vendor, ros-jazzy-tobas-kdl-parser, ros-jazzy-tobas-path-tools, ros-jazzy-tobas-property-client, ros-jazzy-tobas-property-server, ros-jazzy-tobas-qt-tools, ros-jazzy-tobas-rapidcsv-vendor, ros-jazzy-tobas-ros2-tools, ros-jazzy-tobas-rviz-plugin, ros-jazzy-tobas-rviz-wrapper, ros-jazzy-tobas-string-tools, ros-jazzy-tobas-uadf, ros-jazzy-tobas-urdf, ros-jazzy-tobas-visualization-msgs, ros-jazzy-tobas-xml-tools, ros-jazzy-visualization-msgs, ros-jazzy-xacro, ros-jazzy-ros-workspace
+Description: Qt setup assistant for configuring Tobas projects, vehicles, and runtime environments.
