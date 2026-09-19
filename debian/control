@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-actuator-test
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-tobas-dparam-client, ros-jazzy-tobas-drone-core, ros-jazzy-tobas-gui-common, ros-jazzy-tobas-qt-tools, ros-jazzy-tobas-rqt-bridge, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_actuator_test/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-actuator-test
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-tobas-dparam-client, ros-jazzy-tobas-drone-core, ros-jazzy-tobas-gui-common, ros-jazzy-tobas-qt-tools, ros-jazzy-tobas-rqt-bridge, ros-jazzy-ros-workspace
+Description: Qt application for testing actuators and visualizing actuator commands.
