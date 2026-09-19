@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-dummy-pkg
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-rclcpp, ros-jazzy-rclcpp-components, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_dummy_pkg/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-dummy-pkg
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-rclcpp, ros-jazzy-rclcpp-components, ros-jazzy-ros-workspace
+Description: Placeholder package for nodes and other items that have not yet been implemented.
