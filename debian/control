@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-rviz-plugin
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-rsl, ros-jazzy-rviz-common, ros-jazzy-rviz-default-plugins, ros-jazzy-tf2-eigen, ros-jazzy-tobas-visualization-msgs, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_rviz_plugin/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-rviz-plugin
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-rsl, ros-jazzy-rviz-common, ros-jazzy-rviz-default-plugins, ros-jazzy-tf2-eigen, ros-jazzy-tobas-visualization-msgs, ros-jazzy-ros-workspace
+Description: RViz display plugins for visualizing Tobas vehicles, models, trajectories, and sensor data.
