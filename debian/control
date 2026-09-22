@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-gazebo-ros
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-tobas-drone-msgs-adapter, ros-jazzy-tobas-gazebo-common, ros-jazzy-tobas-gazebo-msgs, ros-jazzy-tobas-msgs-adapter, ros-jazzy-tobas-node, ros-jazzy-tobas-tools, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_gazebo_ros/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-gazebo-ros
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-tobas-drone-msgs-adapter, ros-jazzy-tobas-gazebo-common, ros-jazzy-tobas-gazebo-msgs, ros-jazzy-tobas-msgs-adapter, ros-jazzy-tobas-node, ros-jazzy-tobas-tools, ros-jazzy-ros-workspace
+Description: ROS 2 bridges between Tobas flight interfaces and Gazebo transport.
