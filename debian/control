@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-eskf
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-tobas-debug-msgs-adapter, ros-jazzy-tobas-eigen-tools, ros-jazzy-tobas-geographic, ros-jazzy-tobas-kdl-conversions, ros-jazzy-tobas-msgs-adapter, ros-jazzy-tobas-node, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_eskf/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-eskf
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-tobas-debug-msgs-adapter, ros-jazzy-tobas-eigen-tools, ros-jazzy-tobas-geographic, ros-jazzy-tobas-kdl-conversions, ros-jazzy-tobas-msgs-adapter, ros-jazzy-tobas-node, ros-jazzy-ros-workspace
+Description: Error-state Kalman filter library and ROS 2 node for vehicle state estimation.
