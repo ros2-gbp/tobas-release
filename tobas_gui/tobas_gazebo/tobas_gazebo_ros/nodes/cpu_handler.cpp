@@ -1,0 +1,55 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#include <tobas_constants/ros_interface.hpp>
+#include <tobas_node/node.hpp>
+
+#include <tobas_msgs/msg/cpu.hpp>
+
+using namespace std::chrono_literals;
+
+namespace tobas
+{
+namespace gazebo
+{
+class CpuHandlerNode : public BaseNode
+{
+  static constexpr auto kSamplingPeriod = 1s;
+
+  using self = CpuHandlerNode;
+  using super = BaseNode;
+
+public:
+  explicit CpuHandlerNode(const rclcpp::NodeOptions& options = rclcpp::NodeOptions());
+
+private:
+  // Publisher
+  ros2::PublisherPtr<tobas_msgs::msg::Cpu> cpu_pub_;
+
+  // Timer
+  ros2::TimerPtr main_timer_;
+
+  void mainTimerCb();
+};
+
+CpuHandlerNode::CpuHandlerNode(const rclcpp::NodeOptions& options) : super("cpu_handler", nodeOptions_Default(options))
+{
+  cpu_pub_ = createPublisher<tobas_msgs::msg::Cpu>(topic::kCpu);
+  main_timer_ = createTimer(kSamplingPeriod, &self::mainTimerCb, this);
+}
+
+void CpuHandlerNode::mainTimerCb()
+{
+  // Create ROS message.
+  auto cpu_msg = std::make_unique<tobas_msgs::msg::Cpu>();
+  cpu_msg->header.stamp = now();
+
+  // TODO: Get CPU information in a cross-platform way
+
+  // Publish ROS message.
+  cpu_pub_->publish(std::move(cpu_msg));
+}
+}  // namespace gazebo
+}  // namespace tobas
+
+RCLCPP_COMPONENTS_REGISTER_NODE(tobas::gazebo::CpuHandlerNode)
