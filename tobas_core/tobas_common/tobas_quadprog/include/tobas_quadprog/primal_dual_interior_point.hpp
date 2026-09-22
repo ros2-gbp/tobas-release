@@ -1,0 +1,51 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#pragma once
+
+#include "./qpsolver.hpp"
+
+namespace tobas
+{
+namespace quadprog
+{
+/**
+ * @brief A Condensed and Sparse QP Formulation for Predictive Control [Jerez+, 2011]
+ */
+class PrimalDualInteriorPointSolver : public QuadProgSolver
+{
+  using super = QuadProgSolver;
+
+public:
+  explicit PrimalDualInteriorPointSolver();
+
+  bool solve() override;
+
+  bool setNumberOfIterations(const size_t& num_iter);
+  bool setSigma(const double& sigma);
+  bool setAlphaTolerance(const double& alpha_tol);
+
+private:
+  size_t num_iter_ = 10;  // TODO
+  double sigma_ = 0.1;    // TODO
+  double alpha_tol_ = 1e-3;
+
+  bool is_first_solve_ = true;
+
+  Eigen::Index var_dim_;
+  Eigen::Index eq_dim_;
+  Eigen::Index ineq_dim_;
+
+  Eigen::VectorXd theta_;
+  // Eigen::VectorXd nu_;
+  Eigen::VectorXd lam_;
+  Eigen::VectorXd s_;
+
+  Eigen::MatrixXd A_;
+  Eigen::VectorXd b_;
+
+  bool initialize(const QuadProgProblem& scaled);
+  double findAlpha(const Eigen::VectorXd& dlam, const Eigen::VectorXd& ds) const;
+};
+}  // namespace quadprog
+}  // namespace tobas
