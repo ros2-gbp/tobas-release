@@ -1,0 +1,120 @@
+ros-jazzy-tobas-dynamixel-handler (2.16.2-1noble) noble; urgency=high
+
+  * revert version
+  * update CHANGELOG.rst
+  * modify: Bump version to 2.16.2
+  * Contributors: Masayoshi Dohi
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Mon, 21 Sep 2026 15:00:00 -0000
+
+ros-jazzy-tobas-dynamixel-handler (2.16.1-1noble) noble; urgency=high
+
+  * v2.16.1
+  * Contributors: Masayoshi Dohi
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Thu, 17 Sep 2026 15:00:00 -0000
+
+ros-jazzy-tobas-dynamixel-handler (2.16.0-1noble) noble; urgency=high
+
+  * Add description
+  * 0.0.0 -> 2.16.0
+  * .
+  * .
+  * Merge branch 'feature/gcs_layout' into jazzy
+  * style: use explicit decimal literals
+  * Merge branch 'feature/english_translation' into jazzy
+  * wip
+  * Contributors: Masayoshi Dohi
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Tue, 28 Jul 2026 15:00:00 -0000
+
+ros-jazzy-tobas-dynamixel-handler (2.15.0-1noble) noble; urgency=high
+
+  * Merge branch 'jazzy-dev' into jazzy
+  * .
+  * Merge branch 'jazzy-dev' into jazzy
+  * add license
+  * add license
+  * Merge branch 'feature/add_namespace' into jazzy-dev
+  * .
+  * add namespace
+  * Merge branch 'jazzy-dev' into feature/objetc_avoidance
+  * add namespace
+  * Merge branch 'jazzy-dev' into jazzy
+  * Merge branch 'feature/smooth_command_switching' into jazzy-dev
+  * NodeOptoinsをC++側で固定
+    不要な処理を行わないように
+  * add compile option: -Wswitch-enum
+  * tobas_constantsをファイル分割
+  * Contributors: Masayoshi Dohi, Tetsuka Daiki
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Sun, 28 Jun 2026 15:00:00 -0000
+
+ros-jazzy-tobas-dynamixel-handler (2.12.1-1noble) noble; urgency=high
+
+
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Wed, 18 Feb 2026 12:13:14 +0900
+
+ros-jazzy-tobas-dynamixel-handler (2.12.0-1noble) noble; urgency=high
+
+
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Wed, 18 Feb 2026 12:13:14 +0900
+
+ros-jazzy-tobas-dynamixel-handler (2.11.0-1noble) noble; urgency=high
+
+
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Thu, 12 Feb 2026 15:00:00 -0000
+
+ros-jazzy-tobas-dynamixel-handler (2.10.0-1noble) noble; urgency=high
+
+  * Merge branch 'jazzy-dev' into jazzy
+  * modify: fabs -> std::abs
+  * Merge branch 'jazzy-dev' into jazzy
+  * fix
+  * .
+  * fix: 扱うジョイント名を指定
+  * .
+  * modify: 状態の発行レートを調整できるようにした
+  * change: pos, vel, curを同時に取得
+  * delete: example.yaml
+  * fix
+  * .
+  * modify: デバイスの絶対パスに対応
+  * .
+  * Dynamixel Bridge
+  * fix: nested rosparam
+  * rename: JointStateBridge -> JointStateBridgeNode
+  * add: JointStateBridge
+  * modify
+  * modify: Dynamixelハンドラを修正など
+  * modify: example.yaml
+  * tobas_std -> tbs
+  * modify: move -> std::move
+  * modify: get_clock()->now() -> now()
+  * Contributors: Masayoshi Dohi
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Wed, 28 Jan 2026 15:00:00 -0000
+
+ros-jazzy-tobas-dynamixel-handler (2.8.0-1noble) noble; urgency=high
+
+  * Merge branch 'jazzy-dev' into jazzy
+  * edit cmakes
+  * リンクエラーを検出
+  * Contributors: Masayoshi Dohi
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Wed, 24 Sep 2025 15:00:00 -0000
+
+ros-jazzy-tobas-dynamixel-handler (2.7.0-1noble) noble; urgency=high
+
+  * Merge branch 'jazzy-develop' into jazzy
+  * .
+  * コンパイルオプションを追加
+  * refactor
+  * Contributors: Masayoshi Dohi
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Mon, 08 Sep 2025 15:00:00 -0000
+
+
