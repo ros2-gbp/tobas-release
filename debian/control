@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-control-system
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), qtpositioning5-dev, ros-jazzy-ament-cmake, ros-jazzy-magic-enum, ros-jazzy-tobas-constants, ros-jazzy-tobas-drone-core, ros-jazzy-tobas-geographic, ros-jazzy-tobas-gui-common, ros-jazzy-tobas-mission-msgs-adapter, ros-jazzy-tobas-msgs-adapter, ros-jazzy-tobas-path-tools, ros-jazzy-tobas-property-client, ros-jazzy-tobas-qt-tools, ros-jazzy-tobas-ros2-tools, ros-jazzy-tobas-rqt-bridge, ros-jazzy-tobas-trajectory-generation, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_control_system/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-control-system
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, qtpositioning5-dev, ros-jazzy-magic-enum, ros-jazzy-tobas-constants, ros-jazzy-tobas-drone-core, ros-jazzy-tobas-geographic, ros-jazzy-tobas-gui-common, ros-jazzy-tobas-mission-msgs-adapter, ros-jazzy-tobas-msgs-adapter, ros-jazzy-tobas-path-tools, ros-jazzy-tobas-property-client, ros-jazzy-tobas-qt-tools, ros-jazzy-tobas-ros2-tools, ros-jazzy-tobas-rqt-bridge, ros-jazzy-tobas-trajectory-generation, ros-jazzy-ros-workspace
+Description: Qt control dashboard for monitoring vehicles and planning and executing missions.
