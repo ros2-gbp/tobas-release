@@ -1,0 +1,17 @@
+<package format="3">
+
+	<name>tobas_constants</name>
+	<version>2.16.2</version>
+	<description>Shared constants and enumerations for Tobas flight modes, frames, hardware, topics, and commands.</description>
+	<maintainer email="m.dohi@tobas.jp">Masayoshi Dohi</maintainer>
+	<license>Apache-2.0</license>
+
+	<buildtool_depend>ament_cmake</buildtool_depend>
+
+	<depend>yaml-cpp</depend>
+
+	<export>
+		<build_type>ament_cmake</build_type>
+	</export>
+
+</package>
