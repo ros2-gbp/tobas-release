@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-gazebo-conversions
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-geometry-msgs, ros-jazzy-gz-math-vendor, ros-jazzy-gz-msgs-vendor, ros-jazzy-tobas-kdl, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_gazebo_conversions/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-gazebo-conversions
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-geometry-msgs, ros-jazzy-gz-math-vendor, ros-jazzy-gz-msgs-vendor, ros-jazzy-tobas-kdl, ros-jazzy-ros-workspace
+Description: Conversions between Gazebo math types and Tobas ROS 2 message types.
