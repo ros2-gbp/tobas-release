@@ -2,8 +2,16 @@
 Changelog for package tobas_ros_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.16.2 (2026-09-22)
+-------------------
+* revert version
+* update CHANGELOG.rst
+* modify: Bump version to 2.16.2
+* Contributors: Masayoshi Dohi
+
 2.16.1 (2026-09-18)
 -------------------
+* v2.16.1
 * PWMコマンドのインターフェースを追加
 * Contributors: Masayoshi Dohi
 
