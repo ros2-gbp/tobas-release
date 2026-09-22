@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-fc1xx-ros
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-tobas-drone-msgs-adapter, ros-jazzy-tobas-dsp, ros-jazzy-tobas-fc1xx-core, ros-jazzy-tobas-hardware-common, ros-jazzy-tobas-ic-drivers, ros-jazzy-tobas-msgs-adapter, ros-jazzy-tobas-real-common, ros-jazzy-tobas-tools, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_fc1xx_ros/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-fc1xx-ros
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-tobas-drone-msgs-adapter, ros-jazzy-tobas-dsp, ros-jazzy-tobas-fc1xx-core, ros-jazzy-tobas-hardware-common, ros-jazzy-tobas-ic-drivers, ros-jazzy-tobas-msgs-adapter, ros-jazzy-tobas-real-common, ros-jazzy-tobas-tools, ros-jazzy-ros-workspace
+Description: ROS 2 sensor and actuator driver nodes for FC1xx flight controllers.
