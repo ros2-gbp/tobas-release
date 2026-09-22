@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-keyboard-teleop
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-tobas-command-msgs-adapter, ros-jazzy-tobas-keyboard, ros-jazzy-tobas-mission-items, ros-jazzy-tobas-mission-msgs, ros-jazzy-tobas-msgs-adapter, ros-jazzy-tobas-node, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_keyboard_teleop/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-keyboard-teleop
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-tobas-command-msgs-adapter, ros-jazzy-tobas-keyboard, ros-jazzy-tobas-mission-items, ros-jazzy-tobas-mission-msgs, ros-jazzy-tobas-msgs-adapter, ros-jazzy-tobas-node, ros-jazzy-ros-workspace
+Description: Keyboard teleoperation node that publishes position and yaw commands.
