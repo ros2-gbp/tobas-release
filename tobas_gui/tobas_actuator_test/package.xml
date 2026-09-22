@@ -1,0 +1,21 @@
+<package format="3">
+
+  <name>tobas_actuator_test</name>
+  <version>2.16.2</version>
+  <description>Qt application for testing actuators and visualizing actuator commands.</description>
+  <maintainer email="m.dohi@tobas.jp">Masayoshi Dohi</maintainer>
+  <license>GPL-3.0-or-later</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>tobas_drone_core</depend>
+  <depend>tobas_dparam_client</depend>
+  <depend>tobas_qt_tools</depend>
+  <depend>tobas_rqt_bridge</depend>
+  <depend>tobas_gui_common</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+
+</package>
