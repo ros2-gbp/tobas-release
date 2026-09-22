@@ -1,0 +1,59 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#include "tobas_linux/spi_dev.hpp"
+
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+
+#include <cassert>
+#include <cstring>
+#include <iostream>
+
+namespace tobas
+{
+namespace linux
+{
+SPIdev::SPIdev() noexcept
+{
+}
+
+SPIdev::~SPIdev() noexcept
+{
+  if (spi_fd_ >= 0) {
+    close(spi_fd_);
+  }
+}
+
+bool SPIdev::initialize(const char* spi_dev, void* tx_buf, void* rx_buf, uint32_t speed_hz, uint8_t bits_per_word) noexcept
+{
+  spi_fd_ = open(spi_dev, O_RDWR);
+  if (spi_fd_ < 0) {
+    std::cerr << "Failed to open SPI device: " << spi_dev << std::endl;
+    return false;
+  }
+
+  std::memset(&spi_transfer_, 0, sizeof(spi_ioc_transfer));
+  spi_transfer_.tx_buf = (uint64_t)tx_buf;
+  spi_transfer_.rx_buf = (uint64_t)rx_buf;
+  spi_transfer_.speed_hz = speed_hz;
+  spi_transfer_.bits_per_word = bits_per_word;
+  spi_transfer_.delay_usecs = 0;
+
+  return true;
+}
+
+bool SPIdev::transfer(uint32_t length) noexcept
+{
+  spi_transfer_.len = length;
+
+  if (ioctl(spi_fd_, SPI_IOC_MESSAGE(1), &spi_transfer_) < 0) {
+    std::cerr << "SPI transfer failed." << std::endl;
+    return false;
+  }
+
+  return true;
+}
+}  // namespace linux
+}  // namespace tobas
