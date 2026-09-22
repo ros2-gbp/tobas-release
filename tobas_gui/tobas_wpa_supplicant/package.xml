@@ -1,0 +1,17 @@
+<package format="3">
+
+	<name>tobas_wpa_supplicant</name>
+	<version>2.16.1</version>
+	<description>Library for reading, editing, and exporting wpa_supplicant network configuration.</description>
+	<maintainer email="m.dohi@tobas.jp">Masayoshi Dohi</maintainer>
+	<license>GPL-3.0-or-later</license>
+
+	<buildtool_depend>ament_cmake</buildtool_depend>
+
+	<depend>tobas_string_tools</depend>
+
+	<export>
+		<build_type>ament_cmake</build_type>
+	</export>
+
+</package>
