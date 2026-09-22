@@ -1,0 +1,96 @@
+# Base: [moveit2/.clang-format](https://github.com/moveit/moveit2/blob/main/.clang-format)
+
+BasedOnStyle: Google
+ColumnLimit: 120
+MaxEmptyLinesToKeep: 1
+SortIncludes: CaseSensitive # false -> CaseSensitive
+IncludeBlocks: Preserve # Added
+
+Standard: c++20 # Auto -> c++20
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never
+AccessModifierOffset: -2
+ConstructorInitializerIndentWidth: 2
+NamespaceIndentation: None
+ContinuationIndentWidth: 2 # 4 -> 2
+IndentCaseLabels: true
+IndentFunctionDeclarationAfterType: false
+
+AlignEscapedNewlinesLeft: false
+AlignTrailingComments: true
+
+AllowAllParametersOfDeclarationOnNextLine: false
+ExperimentalAutoDetectBinPacking: false
+ObjCSpaceBeforeProtocolList: true
+Cpp11BracedListStyle: false
+
+AllowShortBlocksOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortCaseLabelsOnASingleLine: false
+
+AlwaysBreakTemplateDeclarations: true
+AlwaysBreakBeforeMultilineStrings: false
+BreakBeforeBinaryOperators: false
+BreakBeforeTernaryOperators: false
+BreakConstructorInitializersBeforeComma: true
+
+BinPackArguments: false # Added
+BinPackParameters: false # true -> false
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+DerivePointerBinding: false
+PointerBindsToType: true
+
+PenaltyExcessCharacter: 50
+PenaltyBreakBeforeFirstCallParameter: 30
+PenaltyBreakComment: 1000
+PenaltyBreakFirstLessLess: 10
+PenaltyBreakString: 100
+PenaltyReturnTypeOnItsOwnLine: 50
+
+SpacesBeforeTrailingComments: 2
+SpacesInParentheses: false
+SpacesInAngles: false
+SpaceInEmptyParentheses: false
+SpacesInCStyleCastParentheses: false
+SpaceAfterCStyleCast: false
+SpaceAfterControlStatementKeyword: true
+SpaceBeforeAssignmentOperators: true
+
+# Configure each individual brace in BraceWrapping
+BreakBeforeBraces: Custom
+
+# Qualifiers (const, volatile, static, etc)
+QualifierAlignment: Custom
+QualifierOrder: ["static", "inline", "constexpr", "const", "volatile", "type"]
+
+# Control of individual brace wrapping cases
+BraceWrapping:
+  AfterCaseLabel: false # true -> false
+  AfterClass: true
+  AfterControlStatement: false # true -> false
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterObjCDeclaration: true # Added
+  AfterStruct: true
+  AfterUnion: true
+  BeforeCatch: true
+  BeforeElse: true
+  BeforeLambdaBody: "true" # Added
+  BeforeWhile: false # Added
+  IndentBraces: false
+  SplitEmptyFunction: true # Added
+  SplitEmptyRecord: true # Added
+  SplitEmptyNamespace: true # Added
+
+# ===== Added =====
+AlignAfterOpenBracket: AlwaysBreak # If arguments do not fit on one line, indent every argument one level.
+AlignOperands: true # Vertically align operators in long expressions.
+FixNamespaceComments: true # Add or fix comments on closing braces for namespaces.
+ShortNamespaceLines: 0 # Add closing namespace comments when the namespace contains at least one line.
+InsertBraces: true # Always insert braces.
+AllowAllArgumentsOnNextLine: true # If arguments do not fit on one line, allow them to continue together on the next line.
+# RemoveEmptyLinesInUnwrappedLines: true # clang-format 20+
