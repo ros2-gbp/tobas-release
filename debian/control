@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-fc2xx-test
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-tobas-fc2xx-core, ros-jazzy-tobas-ic-drivers, ros-jazzy-tobas-sbus-driver, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_fc2xx_test/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-fc2xx-test
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-tobas-fc2xx-core, ros-jazzy-tobas-ic-drivers, ros-jazzy-tobas-sbus-driver, ros-jazzy-ros-workspace
+Description: Hardware and integration tests for FC2xx flight controllers.
