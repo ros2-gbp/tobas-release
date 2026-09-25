@@ -1,18 +1,59 @@
-# Tobas Object Avoidance
+![Tobas](./docs/docs/assets/brand/logo_black.png#gh-light-mode-only)
+![Tobas](./docs/docs/assets/brand/logo_white.png#gh-dark-mode-only)
 
-This package receives an obstacle map and outputs repulsive acceleration for obstacle avoidance.
+[![Latest version](https://img.shields.io/github/v/release/TobasFlightControl/tobas)](https://github.com/TobasFlightControl/tobas/releases)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-The repulsive potential field U<sub>r</sub>(q) centered at the obstacle position is defined as follows.
-$$U_r(q) = \begin{cases} \frac{1}{2}k_r\left(\frac{1}{\rho(q, q_o)} - \frac{1}{\rho_0}\right)^2, & \rho(q, q_o) \leq \rho_0 \\ 0 & \rho(q, q_o) > \rho_0 \end{cases}$$
+Tobas is a Linux-based, model-based flight controller for drones and robotic aircraft.
+It designs control systems from each airframe's physical model,
+so unconventional aircraft can be simulated, configured, and flown through the same ROS 2 interface.
 
-k<sub>r</sub>: coefficient
-q: obstacle position
-q<sub>0</sub>: drone position
-ρ<sub>0</sub>: repulsive influence range
-ρ: Euclidean distance between two points
+## Quick Links
 
-The magnitude F<sub>r</sub> of the repulsive force acting on the drone is obtained by differentiating U<sub>r</sub>(q).
-$$F_r = \begin{cases} k_r\left(\frac{1}{\rho(q, q_o)} - \frac{1}{\rho_0}\right)\frac{1}{\rho(q, q_o)^2}\nabla \rho(q, q_o), & \rho(q, q_o) \leq \rho_0 \\ 0 & \rho(q, q_o) > \rho_0 \end{cases}$$
+| Purpose                  | Document                                                                                              |
+| ------------------------ | ----------------------------------------------------------------------------------------------------- |
+| Use Tobas                | [Tobas User Guide](https://tobasflightcontrol.github.io/tobas/latest/)                                |
+| Install Tobas            | [Installation Guide](https://tobasflightcontrol.github.io/tobas/latest/getting_started/installation/) |
+| Build from source        | [Setup](./SETUP.md)                                                                                   |
+| Contribute changes       | [Contributing to Tobas](./CONTRIBUTING.md)                                                            |
+| Edit the documentation   | [Documentation README](./docs/README.md)                                                              |
+| Review licensing options | [Commercial License](./COMMERCIAL-LICENSE.md)                                                         |
 
-This is based on the following paper.
-https://www.researchgate.net/publication/392565826_Artificial_potential_field_method_for_path_and_trajectory_planning_of_unmanned_aerial_vehicles_A_review
+## Supported Platform
+
+- Ubuntu 24.04 LTS
+- ROS 2 Jazzy
+- Debian Trixie for flight-controller images
+
+## Repository Layout
+
+- `docs`: MkDocs-based user and developer documentation.
+- `tobas_core`: Core flight-control, estimation, hardware, message, failsafe, and utility packages.
+- `tobas_gui`: Setup, ground-station, simulation, tuning, and visualization tools.
+- `tobas_examples`: Example packages and code-style references.
+- `tobas_dev_tools`: Development, synchronization, and deployment helper scripts.
+- `tobas_deb`: Debian packaging resources for supported images.
+- `tobas_external`: Third-party libraries wrapped for the Tobas workspace.
+
+## For Contributors
+
+See [Contributing to Tobas](./CONTRIBUTING.md) for source setup, code style, pre-commit checks, and Git guidelines.
+
+## License
+
+Unless otherwise noted, this repository is licensed under the GNU General Public License,
+version 3 or any later version (GPL-3.0-or-later).
+
+The `*_msgs` packages, including their `.msg`, `.srv`, and `.action` files,
+are licensed under Apache-2.0.
+
+See [LICENSE](./LICENSE) for the default open source license,
+and [LICENSES/Apache-2.0.txt](./LICENSES/Apache-2.0.txt) for the Apache-2.0 license text.
+
+If you want to distribute Tobas as part of a proprietary product,
+or if you do not wish to comply with the GPL for distribution,
+alternative commercial licensing is available from Tobas.
+
+See [COMMERCIAL-LICENSE.md](./COMMERCIAL-LICENSE.md) for commercial licensing information.
+
+For commercial licensing inquiries, please contact: contact@tobas.jp
