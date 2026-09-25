@@ -1,0 +1,147 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#include "tobas_actuator_test/joint_test/joint_test.hpp"
+
+#include <tobas_gui_common/constants.hpp>
+#include <tobas_path_tools/join.hpp>
+#include <tobas_qt_tools/message.hpp>
+#include <tobas_qt_tools/widgets/description_widget.hpp>
+#include <tobas_ros2_tools/register.hpp>
+
+namespace tobas
+{
+namespace gui
+{
+namespace at
+{
+JointTestWidget::JointTestWidget(
+  rclcpp::Node::SharedPtr node,
+  const RosQtBridge& bridge,
+  const kdl::Tree& tree,
+  const Drone& drone)
+  : node_(node), tree_(tree), drone_(drone)
+{
+  const auto instruction = new qt::DescriptionWidget(
+    "1. Click \"Start\" to start joint test.\n\n"
+    "2. For each channel, confirm that the position, velocity, or effort is correctly following the command.\n\n"
+    "3. If any joint does not behave as expected, please review the UADF or Setup Assistant settings.\n\n"
+    "4. Click \"Stop\" to stop joint test.\n\n",
+    cmn::kBodyPSize);
+
+  start_button_ = new QPushButton("Start");
+  start_button_->setFixedSize(kButtonWidth, kButtonHeight);
+  start_button_->setEnabled(true);
+
+  stop_button_ = new QPushButton("Stop");
+  stop_button_->setFixedSize(kButtonWidth, kButtonHeight);
+  stop_button_->setEnabled(false);
+
+  zero_button_ = new QPushButton("Zero");
+  zero_button_->setFixedSize(kButtonWidth, kButtonHeight);
+  zero_button_->setEnabled(false);
+
+  home_button_ = new QPushButton("Home");
+  home_button_->setFixedSize(kButtonWidth, kButtonHeight);
+  home_button_->setEnabled(false);
+
+  commands_publisher_ = new JointCommandsPublisherWidget(node, tree, drone);
+
+  // Layout
+  const auto cols = new QHBoxLayout();
+  cols->addWidget(start_button_);
+  cols->addWidget(stop_button_);
+  cols->addStretch();
+  cols->addWidget(zero_button_);
+  cols->addWidget(home_button_);
+
+  rows_->addWidget(instruction);
+  rows_->addLayout(cols);
+  rows_->addWidget(commands_publisher_);
+  rows_->addStretch();
+
+  // Connection
+  connect(start_button_, &QPushButton::clicked, this, &self::onStartButtonClicked);
+  connect(stop_button_, &QPushButton::clicked, this, &self::onStopButtonClicked);
+  connect(zero_button_, &QPushButton::clicked, this, &self::onZeroButtonClicked);
+  connect(home_button_, &QPushButton::clicked, this, &self::onHomeButtonClicked);
+  connect(&bridge, &RosQtBridge::armingReceived, this, &self::armingCb, Qt::QueuedConnection);
+}
+
+const char* JointTestWidget::title() const
+{
+  return "Test Servo Joints";
+}
+
+void JointTestWidget::reset()
+{
+  commands_publisher_->stop();
+
+  start_button_->setEnabled(true);
+  stop_button_->setEnabled(false);
+  zero_button_->setEnabled(false);
+  home_button_->setEnabled(false);
+
+  arming_.reset();
+}
+
+void JointTestWidget::updateInternalDataStructures()
+{
+  reset();
+
+  commands_publisher_->updateInternalDataStructures();
+}
+
+int JointTestWidget::numRegisteredChannels() const
+{
+  return commands_publisher_->numRegisteredChannels();
+}
+
+void JointTestWidget::onStartButtonClicked()
+{
+  // Confirm that the vehicle is not armed.
+  if (!arming_) {
+    qt::qWarnBox(this, "This operation cannot be performed because the arming status has not been received yet.");
+    return;
+  }
+  if (arming_->data) {
+    qt::qWarnBox(this, "This operation cannot be performed while the vehicle is armed.");
+    return;
+  }
+
+  commands_publisher_->start();
+
+  start_button_->setEnabled(false);
+  stop_button_->setEnabled(true);
+  zero_button_->setEnabled(true);
+  home_button_->setEnabled(true);
+
+  qt::qInfoBox(this, "Joint test started.");
+}
+
+void JointTestWidget::onStopButtonClicked()
+{
+  commands_publisher_->setHome();
+
+  reset();
+
+  qt::qInfoBox(this, "Joint test stopped.");
+}
+
+void JointTestWidget::onZeroButtonClicked()
+{
+  commands_publisher_->setZero();
+}
+
+void JointTestWidget::onHomeButtonClicked()
+{
+  commands_publisher_->setHome();
+}
+
+void JointTestWidget::armingCb(const tobas_msgs::msg::Arming::ConstSharedPtr& arming)
+{
+  arming_ = arming;
+}
+}  // namespace at
+}  // namespace gui
+}  // namespace tobas
