@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-ssh-client
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-tobas-ros2-tools, ros-jazzy-tobas-ssh-msgs, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_ssh_client/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-ssh-client
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-tobas-ros2-tools, ros-jazzy-tobas-ssh-msgs, ros-jazzy-ros-workspace
+Description: C++ ROS 2 client for remote command execution and file transfer over SSH.
