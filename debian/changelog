@@ -1,0 +1,102 @@
+ros-jazzy-tobas-gazebo-tools (2.16.4-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Thu, 24 Sep 2026 15:00:00 -0000
+
+ros-jazzy-tobas-gazebo-tools (2.16.3-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Thu, 24 Sep 2026 15:00:00 -0000
+
+ros-jazzy-tobas-gazebo-tools (2.16.2-1bookworm) bookworm; urgency=high
+
+  * revert version
+  * update CHANGELOG.rst
+  * modify: Bump version to 2.16.2
+  * Contributors: Masayoshi Dohi
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Mon, 21 Sep 2026 15:00:00 -0000
+
+ros-jazzy-tobas-gazebo-tools (2.16.1-1bookworm) bookworm; urgency=high
+
+  * v2.16.1
+  * Contributors: Masayoshi Dohi
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Thu, 17 Sep 2026 15:00:00 -0000
+
+ros-jazzy-tobas-gazebo-tools (2.16.0-1bookworm) bookworm; urgency=high
+
+  * Add description
+  * 0.0.0 -> 2.16.0
+  * Merge branch 'feature/english_translation' into jazzy
+  * English translation
+  * English translation
+  * Contributors: Masayoshi Dohi
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Tue, 28 Jul 2026 15:00:00 -0000
+
+ros-jazzy-tobas-gazebo-tools (2.15.0-1bookworm) bookworm; urgency=high
+
+  * Merge branch 'jazzy-dev' into jazzy
+  * C由来の関数を排除
+  * Merge branch 'jazzy-dev' into jazzy
+  * add license
+  * add license
+  * Merge branch 'feature/add_namespace' into jazzy-dev
+  * Merge branch 'jazzy-dev' into feature/objetc_avoidance
+  * add namespace
+  * Merge branch 'jazzy-dev' into jazzy
+  * add compile option: -Wswitch-enum
+  * refactor
+  * Merge branch 'release/v2.12' into feature/refine_img_processing
+  * Contributors: Masayoshi Dohi, Tetsuka Daiki, ok10171
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Sun, 28 Jun 2026 15:00:00 -0000
+
+ros-jazzy-tobas-gazebo-tools (2.12.1-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Wed, 18 Feb 2026 12:13:14 +0900
+
+ros-jazzy-tobas-gazebo-tools (2.12.0-1bookworm) bookworm; urgency=high
+
+  * Merge branch 'jazzy-dev' into jazzy
+  * .
+  * Contributors: Masayoshi Dohi
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Wed, 18 Feb 2026 12:13:14 +0900
+
+ros-jazzy-tobas-gazebo-tools (2.11.0-1bookworm) bookworm; urgency=high
+
+  * Merge branch 'jazzy-dev' into jazzy
+  * add gazebo packages
+  * Contributors: Masayoshi Dohi
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Thu, 12 Feb 2026 15:00:00 -0000
+
+ros-jazzy-tobas-gazebo-tools (2.10.0-1bookworm) bookworm; urgency=high
+
+  * Merge branch 'jazzy-dev' into jazzy
+  * change: 世界座標系をNWU座標系からENU座標系に変更
+  * change: Gazeboレンダリングの開始を待つ
+  * move: tobas_gazebo
+  * Contributors: Masayoshi Dohi
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Wed, 28 Jan 2026 15:00:00 -0000
+
+ros-jazzy-tobas-gazebo-tools (2.8.0-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Wed, 24 Sep 2025 15:00:00 -0000
+
+ros-jazzy-tobas-gazebo-tools (2.7.0-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Mon, 08 Sep 2025 15:00:00 -0000
+
+
