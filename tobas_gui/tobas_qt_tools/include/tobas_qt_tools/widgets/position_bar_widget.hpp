@@ -1,0 +1,122 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#pragma once
+
+#include <QColor>
+#include <QWidget>
+
+namespace tobas
+{
+namespace qt
+{
+class PositionBarWidget : public QWidget
+{
+  Q_OBJECT
+
+  using super = QWidget;
+
+public:
+  explicit PositionBarWidget(QWidget* parent = nullptr);
+  explicit PositionBarWidget(double minimum, double maximum, QWidget* parent = nullptr);
+
+  bool hasCenterText() const;
+  bool hasLowerText() const;
+  bool hasUpperText() const;
+  bool hasValue() const;
+  bool hasLower() const;
+  bool hasUpper() const;
+
+  double getMinimum() const;
+  double getMaximum() const;
+  int getLineWidth() const;
+  int getTextPSize() const;
+  const QString& getCenterText() const;
+  const QString& getLowerText() const;
+  const QString& getUpperText() const;
+  double getValue() const;
+  double getLower() const;
+  double getUpper() const;
+  double getMiddle() const;
+  double getRange() const;
+
+  void setMinimum(double minimum);
+  void setMaximum(double maximum);
+  void setFillRange(bool fill_range);
+  void setLineWidth(int line_width);
+  void setTextPSize(int text_psize);
+  void setFillColor(const QColor& color);
+  void setLimitLineColor(const QColor& color);
+  void setValueLineColor(const QColor& color);
+  void setCenterText(const QString& text);
+  void setLowerText(const QString& text);
+  void setUpperText(const QString& text);
+  void setValue(double value);
+  void setLower(double lower);
+  void setUpper(double upper);
+
+  void clear();
+
+protected:
+  void paintEvent(QPaintEvent* event) override;
+
+  double minimum_ = 0.0;
+  double maximum_ = 1.0;
+  bool fill_range_ = true;
+  int line_width_ = 3;
+  int text_psize_ = 10;
+  QColor fill_color_ = Qt::green;
+  QColor limit_line_color_ = Qt::black;
+  QColor value_line_color_ = Qt::red;
+
+  std::optional<QString> center_text_;
+  std::optional<QString> lower_text_;
+  std::optional<QString> upper_text_;
+  std::optional<double> value_;
+  std::optional<double> lower_;
+  std::optional<double> upper_;
+
+  virtual void drawRange(QPainter& painter, double lower, double upper) = 0;
+  virtual void drawValue(QPainter& painter, double value) = 0;
+  virtual void drawCenterText(QPainter& painter, const QString& text) = 0;
+  virtual void drawLowerText(QPainter& painter, const QString& text) = 0;
+  virtual void drawUpperText(QPainter& painter, const QString& text) = 0;
+};
+
+class HPositionBarWidget : public PositionBarWidget
+{
+  Q_OBJECT
+
+public:
+  using PositionBarWidget::PositionBarWidget;
+
+protected:
+  void drawRange(QPainter& painter, double lower, double upper) override;
+  void drawValue(QPainter& painter, double value) override;
+  void drawCenterText(QPainter& painter, const QString& text) override;
+  void drawLowerText(QPainter& painter, const QString& text) override;
+  void drawUpperText(QPainter& painter, const QString& text) override;
+
+private:
+  void drawTextCommon(QPainter& painter);
+};
+
+class VPositionBarWidget : public PositionBarWidget
+{
+  Q_OBJECT
+
+public:
+  using PositionBarWidget::PositionBarWidget;
+
+protected:
+  void drawRange(QPainter& painter, double lower, double upper) override;
+  void drawValue(QPainter& painter, double value) override;
+  void drawCenterText(QPainter& painter, const QString& text) override;
+  void drawLowerText(QPainter& painter, const QString& text) override;
+  void drawUpperText(QPainter& painter, const QString& text) override;
+
+private:
+  void drawTextCommon(QPainter& painter);
+};
+}  // namespace qt
+}  // namespace tobas
