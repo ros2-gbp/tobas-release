@@ -1,59 +1,72 @@
-![Tobas](./docs/docs/assets/brand/logo_black.png#gh-light-mode-only)
-![Tobas](./docs/docs/assets/brand/logo_white.png#gh-dark-mode-only)
+# Tobas Fail-Safe
 
-[![Latest version](https://img.shields.io/github/v/release/TobasFlightControl/tobas)](https://github.com/TobasFlightControl/tobas/releases)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+## Common Specification
 
-Tobas is a Linux-based, model-based flight controller for drones and robotic aircraft.
-It designs control systems from each airframe's physical model,
-so unconventional aircraft can be simulated, configured, and flown through the same ROS 2 interface.
+### Fail-Safe Flow
 
-## Quick Links
+- Disarm if a fail-safe is triggered before takeoff.
+- The fail-safe flow is unified and always ends with disarm: RTL -> Land -> Disarm
 
-| Purpose                  | Document                                                                                              |
-| ------------------------ | ----------------------------------------------------------------------------------------------------- |
-| Use Tobas                | [Tobas User Guide](https://tobasflightcontrol.github.io/tobas/latest/)                                |
-| Install Tobas            | [Installation Guide](https://tobasflightcontrol.github.io/tobas/latest/getting_started/installation/) |
-| Build from source        | [Setup](./SETUP.md)                                                                                   |
-| Contribute changes       | [Contributing to Tobas](./CONTRIBUTING.md)                                                            |
-| Edit the documentation   | [Documentation README](./docs/README.md)                                                              |
-| Review licensing options | [Commercial License](./COMMERCIAL-LICENSE.md)                                                         |
+### Conditions That Do Not Trigger Fail-Safe
 
-## Supported Platform
+1. During manual control
+2. When position and velocity estimation accuracy is low
 
-- Ubuntu 24.04 LTS
-- ROS 2 Jazzy
-- Debian Trixie for flight-controller images
+## Behavior
 
-## Repository Layout
+### RTL (Return to Launch)
 
-- `docs`: MkDocs-based user and developer documentation.
-- `tobas_core`: Core flight-control, estimation, hardware, message, failsafe, and utility packages.
-- `tobas_gui`: Setup, ground-station, simulation, tuning, and visualization tools.
-- `tobas_examples`: Example packages and code-style references.
-- `tobas_dev_tools`: Development, synchronization, and deployment helper scripts.
-- `tobas_deb`: Debian packaging resources for supported images.
-- `tobas_external`: Third-party libraries wrapped for the Tobas workspace.
+Ascend to the minimum altitude, return to the arming point, land, and disarm.
 
-## For Contributors
+### Land
 
-See [Contributing to Tobas](./CONTRIBUTING.md) for source setup, code style, pre-commit checks, and Git guidelines.
+Land in place and disarm.
 
-## License
+### Disarm
 
-Unless otherwise noted, this repository is licensed under the GNU General Public License,
-version 3 or any later version (GPL-3.0-or-later).
+Stop all motors immediately.
 
-The `*_msgs` packages, including their `.msg`, `.srv`, and `.action` files,
-are licensed under Apache-2.0.
+## Check Items
 
-See [LICENSE](./LICENSE) for the default open source license,
-and [LICENSES/Apache-2.0.txt](./LICENSES/Apache-2.0.txt) for the Apache-2.0 license text.
+### Battery Fail-Safe
 
-If you want to distribute Tobas as part of a proprietary product,
-or if you do not wish to comply with the GPL for distribution,
-alternative commercial licensing is available from Tobas.
+#### Trigger Condition
 
-See [COMMERCIAL-LICENSE.md](./COMMERCIAL-LICENSE.md) for commercial licensing information.
+The battery voltage remains below the threshold for a certain period of time.
 
-For commercial licensing inquiries, please contact: contact@tobas.jp
+#### Behavior
+
+Land
+
+#### Recovery
+
+None
+
+### Radio Fail-Safe
+
+#### Trigger Condition
+
+S.BUS from the receiver is interrupted for a certain period of time.
+
+#### Behavior
+
+- If position can be estimated -> RTL
+- If position cannot be estimated -> Land
+
+#### Recovery
+
+Resume manual control once S.BUS is detected again.
+
+### Rotor Fail-Safe
+
+#### Trigger Condition
+
+At least one rotor liveliness status becomes false.
+
+#### Behavior
+
+RTL
+
+#### Recovery
+
+None
