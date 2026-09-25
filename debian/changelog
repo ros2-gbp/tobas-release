@@ -1,0 +1,91 @@
+ros-jazzy-tobas-gamepad-ros (2.16.4-1bookworm) bookworm; urgency=high
+
+  * Change maintainer
+  * Contributors: Masayoshi Dohi
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Thu, 24 Sep 2026 15:00:00 -0000
+
+ros-jazzy-tobas-gamepad-ros (2.16.3-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Masayoshi Dohi" <m.dohi@tobas.jp>  Thu, 24 Sep 2026 15:00:00 -0000
+
+ros-jazzy-tobas-gamepad-ros (2.16.2-1bookworm) bookworm; urgency=high
+
+  * revert version
+  * update CHANGELOG.rst
+  * modify: Bump version to 2.16.2
+  * Contributors: Masayoshi Dohi
+
+ -- "Ryo Onitsuka" <r.onitsuka@tobas.jp>  Mon, 21 Sep 2026 15:00:00 -0000
+
+ros-jazzy-tobas-gamepad-ros (2.16.1-1bookworm) bookworm; urgency=high
+
+  * v2.16.1
+  * Contributors: Masayoshi Dohi
+
+ -- "Ryo Onitsuka" <r.onitsuka@tobas.jp>  Thu, 17 Sep 2026 15:00:00 -0000
+
+ros-jazzy-tobas-gamepad-ros (2.16.0-1bookworm) bookworm; urgency=high
+
+  * 不要なターゲットを削除
+  * fix
+  * 0.0.0 -> 2.16.0
+  * Merge branch 'feature/use-geographiclib' into jazzy
+  * .
+  * Merge branch 'feature/english_translation' into jazzy
+  * English translation
+  * Contributors: Masayoshi Dohi
+
+ -- "Ryo Onitsuka" <r.onitsuka@tobas.jp>  Tue, 28 Jul 2026 15:00:00 -0000
+
+ros-jazzy-tobas-gamepad-ros (2.15.0-1bookworm) bookworm; urgency=high
+
+  * Merge branch 'jazzy-dev' into jazzy
+  * RCLCPP_HOGE -> TOBAS_HOGE
+  * 依存関係を書くなど
+  * Merge pull request #9 <https://github.com/TobasFlightControl/tobas/issues/9> from TobasFlightControl/feature/gamepad-rc-input
+    Add D-ROC gamepad RC input publisher
+  * Address initial PR review comments for Tobas GUI
+  * Contributors: Masayoshi Dohi, onionitsuka
+
+ -- "Ryo Onitsuka" <r.onitsuka@tobas.jp>  Sun, 28 Jun 2026 15:00:00 -0000
+
+ros-jazzy-tobas-gamepad-ros (2.12.1-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Ryo Onitsuka" <r.onitsuka@tobas.jp>  Wed, 18 Feb 2026 12:13:14 +0900
+
+ros-jazzy-tobas-gamepad-ros (2.12.0-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Ryo Onitsuka" <r.onitsuka@tobas.jp>  Wed, 18 Feb 2026 12:13:14 +0900
+
+ros-jazzy-tobas-gamepad-ros (2.11.0-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Ryo Onitsuka" <r.onitsuka@tobas.jp>  Thu, 12 Feb 2026 15:00:00 -0000
+
+ros-jazzy-tobas-gamepad-ros (2.10.0-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Ryo Onitsuka" <r.onitsuka@tobas.jp>  Wed, 28 Jan 2026 15:00:00 -0000
+
+ros-jazzy-tobas-gamepad-ros (2.8.0-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Ryo Onitsuka" <r.onitsuka@tobas.jp>  Wed, 24 Sep 2025 15:00:00 -0000
+
+ros-jazzy-tobas-gamepad-ros (2.7.0-1bookworm) bookworm; urgency=high
+
+
+
+ -- "Ryo Onitsuka" <r.onitsuka@tobas.jp>  Mon, 08 Sep 2025 15:00:00 -0000
+
+
