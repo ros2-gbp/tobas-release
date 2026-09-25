@@ -1,13 +1,14 @@
 <package format="3">
 
   <name>tobas_urdf_builder_plugin</name>
-  <version>2.16.2</version>
+  <version>2.16.4</version>
   <description>RViz panel plugin for interactively building and editing URDF robot models.</description>
   <maintainer email="m.dohi@tobas.jp">Masayoshi Dohi</maintainer>
   <license>GPL-3.0-or-later</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
+  <depend>qtbase5-dev</depend>
   <depend>rviz_common</depend>
   <depend>rviz_default_plugins</depend>
   <depend>rviz_rendering</depend>
