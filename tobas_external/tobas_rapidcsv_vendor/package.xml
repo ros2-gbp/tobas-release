@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="3">
+
+  <name>tobas_rapidcsv_vendor</name>
+  <version>2.16.4</version>
+  <description>Vendor package for the header-only rapidcsv CSV parser</description>
+  <maintainer email="m.dohi@tobas.jp">Masayoshi Dohi</maintainer>
+  <license>BSD-3-Clause</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+
+</package>
