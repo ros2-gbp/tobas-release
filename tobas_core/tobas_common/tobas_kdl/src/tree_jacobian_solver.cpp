@@ -1,0 +1,83 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#include "tobas_kdl/tree_jacobian_solver.hpp"
+
+using namespace std;
+
+namespace tobas
+{
+namespace kdl
+{
+TreeJacobianSolver::TreeJacobianSolver(const Tree& tree) : super(tree)
+{
+  resize();
+}
+
+bool TreeJacobianSolver::updateInternalDataStructures()
+{
+  if (!super::updateInternalDataStructures()) {
+    return false;
+  }
+
+  resize();
+
+  return true;
+}
+
+int TreeJacobianSolver::jntToJac(const JntArray& q_in, const string& seg_name)
+{
+  if (!isUpToDate()) {
+    return setDefaultError(kNotUpToDate);
+  }
+  if (q_in.rows() != nj_) {
+    return setDefaultError(kSizeMismatch);
+  }
+  if (!tree_.hasSegment(seg_name)) {
+    return setDefaultError(kOutputRange);
+  }
+
+  // Initialize.
+  J_out_.setZero();
+  T_total_.setIdentity();
+
+  // Lets recursively iterate until we are in the root segment.
+  auto it = tree_.getSegment(seg_name);
+  const auto root_it = tree_.getRootSegment();
+  while (it != root_it) {
+    const auto& ele = it->second;
+    const auto& seg = ele.segment;
+    const auto& q_nr = ele.q_nr;
+
+    // Get the pose of the segment:
+    const auto T_local = seg.pose(q_in(q_nr));
+    // Calculate new T_end:
+    T_total_ = T_local * T_total_;
+
+    // Get the twist of the segment:
+    if (seg.joint().type != Joint::kFixed) {
+      auto t_local = seg.jacobian(q_in(q_nr));
+      // Transform the endpoint of the local twist to the global endpoint:
+      t_local = t_local.refPoint(T_total_.p - T_local.p);
+      // Transform the base of the twist to the endpoint.
+      t_local = T_total_.M.inverse(t_local);
+      // Store the twist in the jacobian:
+      J_out_.setColumn(q_nr, t_local);
+    }
+
+    // Go to the parent.
+    it = ele.parent;
+  }
+
+  // Change the base of the complete jacobian from the endpoint to the base.
+  J_out_.changeBase(T_total_.M);
+
+  return setDefaultError(kNoError);
+}
+
+void TreeJacobianSolver::resize()
+{
+  J_out_.resize(nj_);
+}
+}  // namespace kdl
+}  // namespace tobas
