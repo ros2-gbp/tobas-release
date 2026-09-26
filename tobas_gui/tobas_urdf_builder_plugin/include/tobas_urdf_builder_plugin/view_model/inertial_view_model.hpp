@@ -1,0 +1,55 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#pragma once
+
+#include <memory>
+
+#include "./base_view_model.hpp"
+
+namespace tobas
+{
+namespace gui
+{
+namespace ub
+{
+namespace view_model
+{
+struct Inertia
+{
+  double ixx, ixy, ixz;
+  double iyy, iyz;
+  double izz;
+};
+
+class InertialViewModel : public BaseViewModel<::urdf::Inertial, InertialViewModel>
+{
+public:
+  using BaseViewModel<::urdf::Inertial, InertialViewModel>::BaseViewModel;
+
+  void sync() override;
+
+  const ::urdf::Pose& origin() const;
+  void origin(const ::urdf::Pose& origin);
+
+  double mass() const;
+  void mass(double mass);
+
+  Inertia inertia() const;
+  void inertia(const Inertia& inertia);
+
+  /* Inertia wrt. CoM of a box. */
+  void buildInertiaBox(double x, double y, double z);
+
+  /* Inertia wrt. CoM of a cylinder. */
+  void buildInertiaCylinder(double radius, double length);
+
+  /* Inertia wrt. CoM of a sphere. */
+  void buildInertiaSphere(double radius);
+};
+
+using InertialViewModelPtr = std::shared_ptr<InertialViewModel>;
+}  // namespace view_model
+}  // namespace ub
+}  // namespace gui
+}  // namespace tobas
