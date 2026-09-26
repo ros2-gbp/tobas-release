@@ -1,0 +1,18 @@
+<package format="3">
+
+	<name>tobas_command_msgs_adapter</name>
+	<version>2.16.4</version>
+	<description>ROS 2 type adapters for Tobas flight-command message types.</description>
+	<maintainer email="m.dohi@tobas.jp">Masayoshi Dohi</maintainer>
+	<license>GPL-3.0-or-later</license>
+
+	<buildtool_depend>ament_cmake</buildtool_depend>
+
+	<depend>tobas_command_msgs</depend>
+	<depend>tobas_kdl_msgs_adapter</depend>
+
+	<export>
+		<build_type>ament_cmake</build_type>
+	</export>
+
+</package>
