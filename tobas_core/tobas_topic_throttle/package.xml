@@ -1,0 +1,20 @@
+<package format="3">
+
+	<name>tobas_topic_throttle</name>
+	<version>2.16.4</version>
+	<description>ROS 2 node that republishes topics at a limited rate.</description>
+	<maintainer email="m.dohi@tobas.jp">Masayoshi Dohi</maintainer>
+	<license>GPL-3.0-or-later</license>
+
+	<buildtool_depend>ament_cmake</buildtool_depend>
+
+	<depend>tobas_node</depend>
+	<depend>tobas_tools</depend>
+	<depend>tobas_msgs_adapter</depend>
+	<depend>tobas_real_common</depend>
+
+	<export>
+		<build_type>ament_cmake</build_type>
+	</export>
+
+</package>
