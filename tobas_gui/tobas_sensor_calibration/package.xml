@@ -1,0 +1,31 @@
+<package format="3">
+
+  <name>tobas_sensor_calibration</name>
+  <version>2.16.4</version>
+  <description>Qt application for calibrating Tobas accelerometers, magnetometers, and RC input.</description>
+  <maintainer email="m.dohi@tobas.jp">Masayoshi Dohi</maintainer>
+  <license>GPL-3.0-or-later</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>visualization_msgs</depend>
+  <depend>tobas_eigen_conversions</depend>
+  <depend>tobas_kdl_conversions</depend>
+  <depend>tobas_time_tools</depend>
+  <depend>tobas_geographic</depend>
+  <depend>tobas_property_tree</depend>
+  <depend>tobas_drone_core</depend>
+  <depend>tobas_real_common</depend>
+  <depend>tobas_real_msgs</depend>
+  <depend>tobas_qt_tools</depend>
+  <depend>tobas_rqt_bridge</depend>
+  <depend>tobas_rviz_wrapper</depend>
+  <depend>tobas_gui_common</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+
+</package>
