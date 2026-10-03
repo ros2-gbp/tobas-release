@@ -1,0 +1,31 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#pragma once
+
+#include <tobas_trajectory_generation/offline/base.hpp>
+
+namespace tobas
+{
+namespace mission
+{
+/* Fastest stopping trajectory from an arbitrary velocity and acceleration (memo: 3-49) */
+class StopTrajectory : public traj::TrajectoryGenerator
+{
+public:
+  explicit StopTrajectory(double p0, double v0, double a0, double am, double jm);
+
+  traj::TrajectoryPoint get(double t) const noexcept override;
+  double duration() const noexcept override;
+
+private:
+  const double p0_, v0_, a0_;
+  double am_, jm_;
+  double t1_, t2_, t3_;
+
+  double p(double t) const noexcept;
+  double v(double t) const noexcept;
+  double a(double t) const noexcept;
+};
+}  // namespace mission
+}  // namespace tobas
