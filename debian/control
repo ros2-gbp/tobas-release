@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-sbus-driver
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), libboost-dev, ros-jazzy-ament-cmake, ros-jazzy-tobas-linux, ros-jazzy-tobas-msgs, ros-jazzy-tobas-node, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_sbus_driver/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-sbus-driver
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libboost-dev, ros-jazzy-tobas-linux, ros-jazzy-tobas-msgs, ros-jazzy-tobas-node, ros-jazzy-ros-workspace
+Description: SBUS protocol driver library and ROS 2 receiver node.
