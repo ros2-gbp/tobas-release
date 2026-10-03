@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-core
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_core/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-core
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-tobas-camera, ros-jazzy-tobas-command-msgs, ros-jazzy-tobas-command-msgs-adapter, ros-jazzy-tobas-common, ros-jazzy-tobas-components-rt, ros-jazzy-tobas-config-servers, ros-jazzy-tobas-connection-monitor, ros-jazzy-tobas-constants, ros-jazzy-tobas-controllers, ros-jazzy-tobas-cui, ros-jazzy-tobas-debug-msgs, ros-jazzy-tobas-debug-msgs-adapter, ros-jazzy-tobas-debug-tools, ros-jazzy-tobas-description, ros-jazzy-tobas-disturbance-observer, ros-jazzy-tobas-dparam, ros-jazzy-tobas-drone, ros-jazzy-tobas-dummy-pkg, ros-jazzy-tobas-eskf, ros-jazzy-tobas-failsafe, ros-jazzy-tobas-fake-publishers, ros-jazzy-tobas-hardware, ros-jazzy-tobas-joint-states-bridge, ros-jazzy-tobas-landing-detection, ros-jazzy-tobas-manipulation, ros-jazzy-tobas-mission, ros-jazzy-tobas-msgs, ros-jazzy-tobas-msgs-adapter, ros-jazzy-tobas-node, ros-jazzy-tobas-object-avoidance, ros-jazzy-tobas-pose-pid, ros-jazzy-tobas-property, ros-jazzy-tobas-rc-teleop, ros-jazzy-tobas-real, ros-jazzy-tobas-ros-interface, ros-jazzy-tobas-rosbag-recorder, ros-jazzy-tobas-rotor-anomaly-detection, ros-jazzy-tobas-rotor-controller, ros-jazzy-tobas-tools, ros-jazzy-tobas-topic-throttle, ros-jazzy-tobas-tree-server, ros-jazzy-tobas-version, ros-jazzy-tobas-vibration-filter, ros-jazzy-tobas-wind-model, ros-jazzy-ros-workspace
+Description: Aggregation package for the Tobas core flight-control stack.
