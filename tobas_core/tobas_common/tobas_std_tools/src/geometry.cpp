@@ -1,0 +1,55 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#include "tobas_std_tools/geometry.hpp"
+
+#include <cassert>
+
+#include <tobas_math/core.hpp>
+#include <tobas_math/float.hpp>
+
+namespace tobas
+{
+namespace st
+{
+std::tuple<double, double, double, double>
+quaternionFromEuler(const double& roll, const double& pitch, const double& yaw)
+{
+  const auto cx = std::cos(0.5 * roll);
+  const auto sx = std::sin(0.5 * roll);
+  const auto cy = std::cos(0.5 * pitch);
+  const auto sy = std::sin(0.5 * pitch);
+  const auto cz = std::cos(0.5 * yaw);
+  const auto sz = std::sin(0.5 * yaw);
+
+  const auto x = sx * cy * cz - cx * sy * sz;
+  const auto y = sx * cy * sz + cx * sy * cz;
+  const auto z = -sx * sy * cz + cx * cy * sz;
+  const auto w = sx * sy * sz + cx * cy * cz;
+
+  return { x, y, z, w };
+}
+
+std::tuple<double, double, double>
+eulerFromQuaternion(const double& x, const double& y, const double& z, const double& w)
+{
+  assert(math::isClose(math::sqr(x) + math::sqr(y) + math::sqr(z) + math::sqr(w), 1.0));
+
+  const auto sy = -2 * (x * z - y * w);
+
+  const auto pitch = std::asin(sy);
+
+  double roll, yaw;
+  if (math::isClose(std::abs(sy), 1.0)) {
+    roll = 0.0;
+    yaw = std::atan2(-2 * (x * y - z * w), 2 * (math::sqr(w) + math::sqr(y)) - 1);
+  }
+  else {
+    roll = std::atan2(2 * (y * z + x * w), 2 * (math::sqr(w) + math::sqr(z)) - 1);
+    yaw = std::atan2(2 * (x * y + z * w), 2 * (math::sqr(w) + math::sqr(x)) - 1);
+  }
+
+  return { roll, pitch, yaw };
+}
+}  // namespace st
+}  // namespace tobas
