@@ -2,6 +2,17 @@
 Changelog for package tobas_ros_interface
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+2.16.8 (2026-10-16)
+-------------------
+
+2.16.7 (2026-10-14)
+-------------------
+* change: Receive external repulsive acceleration
+  Remove tobas_object_avoidance and its launch and install dependencies.
+  Expose repulsive_acceleration through the remote interface while
+  preserving its message type and controller settings for compatibility.
+* Contributors: Masayoshi Dohi
+
 2.16.6 (2026-10-03)
 -------------------
 
