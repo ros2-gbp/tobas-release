@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-hardware
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_hardware/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-hardware
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-tobas-fc1xx, ros-jazzy-tobas-fc2xx, ros-jazzy-tobas-hardware-common, ros-jazzy-ros-workspace
+Description: Aggregation package for Tobas flight-controller hardware drivers.
