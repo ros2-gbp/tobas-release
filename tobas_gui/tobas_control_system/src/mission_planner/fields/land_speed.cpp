@@ -1,0 +1,50 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#include "tobas_control_system/mission_planner/fields/land_speed.hpp"
+
+#include <QHBoxLayout>
+
+namespace tobas
+{
+namespace gui
+{
+namespace ctrl
+{
+namespace field
+{
+LandSpeedWidget::LandSpeedWidget()
+{
+  // https://docs.px4.io/main/en/advanced_config/parameter_reference#MPC_LAND_SPEED
+  spin_box_ = new qt::DoubleSpinBox();
+  spin_box_->setDecimals(1);
+  spin_box_->setMinimum(0.6);
+  spin_box_->setMaximum(2.0);
+  spin_box_->setValue(0.7);
+  spin_box_->setSuffix(" m/s");
+
+  const auto cols = new QHBoxLayout();
+  setLayout(cols);
+  cols->addWidget(spin_box_);
+
+  connect(spin_box_, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &BaseFieldWidget::updated);
+}
+
+const char* LandSpeedWidget::label() const
+{
+  return "Descending Speed";
+}
+
+double LandSpeedWidget::getValue() const
+{
+  return spin_box_->value();
+}
+
+void LandSpeedWidget::setValue(double value)
+{
+  spin_box_->setValue(value);
+}
+}  // namespace field
+}  // namespace ctrl
+}  // namespace gui
+}  // namespace tobas
