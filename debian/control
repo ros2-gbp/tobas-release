@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-dynamixel-handler
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-dynamixel-sdk, ros-jazzy-std-srvs, ros-jazzy-tobas-dynamixel-msgs, ros-jazzy-tobas-dynamixel-ros-interface, ros-jazzy-tobas-msgs-adapter, ros-jazzy-tobas-node, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_dynamixel_handler/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-dynamixel-handler
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-dynamixel-sdk, ros-jazzy-std-srvs, ros-jazzy-tobas-dynamixel-msgs, ros-jazzy-tobas-dynamixel-ros-interface, ros-jazzy-tobas-msgs-adapter, ros-jazzy-tobas-node, ros-jazzy-ros-workspace
+Description: ROS 2 nodes for commanding, monitoring, and bridging Dynamixel motors.
