@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-std-msgs-adapter
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-rclcpp, ros-jazzy-tobas-std-msgs, ros-jazzy-tobas-std-tools, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_std_msgs_adapter/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-std-msgs-adapter
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-rclcpp, ros-jazzy-tobas-std-msgs, ros-jazzy-tobas-std-tools, ros-jazzy-ros-workspace
+Description: ROS 2 type adapters for extended standard scalar and pair messages.
