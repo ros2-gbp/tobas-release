@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-failsafe
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-tobas-drone-msgs-adapter, ros-jazzy-tobas-dsp, ros-jazzy-tobas-mission-items, ros-jazzy-tobas-mission-msgs, ros-jazzy-tobas-msgs-adapter, ros-jazzy-tobas-node, ros-jazzy-tobas-tools, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_failsafe/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-failsafe
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-tobas-drone-msgs-adapter, ros-jazzy-tobas-dsp, ros-jazzy-tobas-mission-items, ros-jazzy-tobas-mission-msgs, ros-jazzy-tobas-msgs-adapter, ros-jazzy-tobas-node, ros-jazzy-tobas-tools, ros-jazzy-ros-workspace
+Description: Vehicle health monitoring and failsafe execution nodes.
