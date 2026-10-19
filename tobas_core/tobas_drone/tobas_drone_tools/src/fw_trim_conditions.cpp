@@ -1,0 +1,180 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#include "tobas_drone_tools/fw_trim_conditions.hpp"
+
+#include <tobas_std_tools/console.hpp>
+#include <tobas_std_tools/standard_atmosphere.hpp>
+#include <tobas_std_tools/universal_constants.hpp>
+
+#include "tobas_drone_tools/utils/fixed_wing_tools.hpp"
+
+namespace tobas
+{
+TrimConditions::TrimConditions(const Drone& drone, const kdl::Tree& tree)
+  : drone_(drone), tree_(tree), inertia_solver_(tree), asd_cog_(drone, tree)
+{
+}
+
+bool TrimConditions::updateInternalDataStructures()
+{
+  // Check drone configuration.
+  if (!drone_.fixed_wing) {
+    std::cerr << "The drone is not equipped with fixed wing." << std::endl;
+    return false;
+  }
+  if (drone_.fixed_wing->numControlSurfaces() == 0) {
+    std::cerr << "The drone must have at least 1 control surfaces." << std::endl;
+    return false;
+  }
+
+  // Update solvers.
+  if (!inertia_solver_.updateInternalDataStructures()) {
+    return false;
+  }
+  if (!asd_cog_.updateInternalDataStructures()) {
+    return false;
+  }
+
+  // Set mass.
+  if (inertia_solver_.jntToCart(kdl::JntArray::Zero(tree_.getNrOfJoints())) < 0) {
+    std::cerr << "Inertia solver failed: " << inertia_solver_.errorMessage() << std::endl;
+    return false;
+  }
+  W_ = inertia_solver_.getInertia().getMass() * st::kGravity;
+
+  // Set elevator index.
+  auto max_c_pitch_delta = -INFINITY;
+  for (const auto& [link_name, cs] : drone_.fixed_wing->control_surfaces) {
+    if (std::abs(cs.c_pitch_delta) > max_c_pitch_delta) {
+      max_c_pitch_delta = std::abs(cs.c_pitch_delta);
+      elev_link_name_ = link_name;
+    }
+  }
+
+  // Set coefficients.
+  const auto& aero = drone_.fixed_wing->aerodynamics;
+  const auto& elev_cs = drone_.fixed_wing->control_surfaces.at(elev_link_name_);
+  const auto ml_raito = elev_cs.c_lift_delta / elev_cs.c_pitch_delta;
+  a_ = aero.c_lift_alpha - aero.c_pitch_alpha * ml_raito;
+  b_ = aero.c_lift_0 - aero.c_pitch_0 * ml_raito;
+
+  if (a_ <= 0.0) {
+    std::cerr << "The aerodynamic coefficient \"a\" must be positive." << std::endl;
+    return false;
+  }
+  if (b_ <= 0.0) {
+    std::cerr << "The aerodynamic coefficient \"b\" must be positive." << std::endl;
+    return false;
+  }
+
+  return true;
+}
+
+int TrimConditions::update(double V, const double& rho, const kdl::JntArray& q)
+{
+  assert(V > 0);
+  assert(rho > 0);
+
+  error_code_ = kNoError;
+
+  if (q.rows() != tree_.getNrOfJoints()) {
+    error_msg_ = kErrorSizeMismatch;
+    return error_code_ = kError;
+  }
+
+  // Check whether the velocity is within the valid range.
+  const auto speed_limit = speedLimit(rho);
+  if (V < speed_limit.lower) {
+    if (error_code_ > kWarn) {
+      error_msg_ = "Speed is too low: " + std::to_string(V) + " < " + std::to_string(speed_limit.lower);
+      error_code_ = kWarn;
+    }
+    V = speed_limit.lower;
+  }
+  else if (V > speed_limit.upper) {
+    if (error_code_ > kWarn) {
+      error_msg_ = "Speed is too high: " + std::to_string(V) + " > " + std::to_string(speed_limit.upper);
+      error_code_ = kWarn;
+    }
+    V = speed_limit.upper;
+  }
+
+  // Aliases.
+  const auto& aero = drone_.fixed_wing->aerodynamics;
+  const auto& elev_cs = drone_.fixed_wing->control_surfaces.at(elev_link_name_);
+
+  // Stability derivatives around the CoG.
+  asd_cog_.update(q);
+  if (updateError(asd_cog_) <= kError) {
+    return error_code_;
+  }
+  const auto& c_pitch_alpha_cg = asd_cog_.cPitchAlpha();
+  const auto& c_pitch_elev_cg = asd_cog_.cPitchDelta(elev_link_name_);
+  if (c_pitch_elev_cg == 0) {
+    error_msg_ = "The stability derivative of the elevator wrt. the pitch angle is zero.";
+    return error_code_ = kError;
+  }
+
+  // Constants that depend on arguments.
+  const auto q_bar = dynamicPressure(rho, V);
+
+  // Longitudinal balance.
+  c_L_ = W_ / (q_bar * drone_.fixed_wing->vehicle.wing_surface);                // (2.9-47)
+  alpha_ = (c_L_ - b_) / a_;                                                    // (2.9-49)
+  elevator_ = -(aero.c_pitch_0 + c_pitch_alpha_cg * alpha_) / c_pitch_elev_cg;  // (2.9-46)
+  const auto c_D_alpha = aero.c_drag_0 + aero.c_drag_alpha * alpha_;  // TODO: Consider second and higher orders.
+  c_D_ = c_D_alpha + elev_cs.c_drag_abs_delta * std::abs(elevator_);  // (1.8-3)
+  c_T_ = c_D_ / std::cos(alpha_);                                     // (2.2-10b)
+
+  // Other dependent variables.
+  u_ = V * std::cos(alpha_);
+
+  if (!drone_.fixed_wing->vehicle.alpha_limit.inRange(alpha_)) {
+    if (error_code_ > kWarn) {
+      error_msg_ = "The angle of attack in the trimmed condition is outside the valid range.";
+      error_code_ = kWarn;
+    }
+    alpha_ = drone_.fixed_wing->vehicle.alpha_limit.clamp(alpha_);
+  }
+
+  const auto& joint = tree_.getSegment(elev_cs.link_name)->second.segment.joint();
+  if (elevator_ < joint.lower_limit || joint.upper_limit < elevator_) {
+    if (error_code_ > kWarn) {
+      error_msg_ = "The trim angle of the elevator is outside the range of the angle limit.";
+      error_code_ = kWarn;
+    }
+    elevator_ = std::clamp(elevator_, joint.lower_limit, joint.upper_limit);
+  }
+
+  return error_code_;
+}
+
+st::Range<double> TrimConditions::speedLimit(const double& rho) const
+{
+  assert(rho > 0);
+
+  const auto c = 2 * W_ / rho / drone_.fixed_wing->vehicle.wing_surface;
+
+  // Compute the minimum velocity from the maximum angle of attack.
+  const auto max_den = a_ * drone_.fixed_wing->vehicle.alpha_limit.upper + b_;
+  assert(max_den > 0.0);
+  const auto V_min = std::sqrt(c / max_den);
+
+  // Compute the maximum velocity from the minimum angle of attack.
+  // If the denominator approaches +0, level flight is theoretically possible at infinite velocity.
+  const auto min_den = a_ * drone_.fixed_wing->vehicle.alpha_limit.lower + b_;
+  const auto V_max = min_den > 0.0 ? std::sqrt(c / min_den) : INFINITY;
+
+  return st::Range<double>(V_min, V_max);
+}
+
+double TrimConditions::takeOffSpeed(const double& rho) const
+{
+  assert(rho > 0);
+
+  const auto c = 2 * W_ / rho / drone_.fixed_wing->vehicle.wing_surface;
+  constexpr double alpha_zero = 0.0;
+  return std::sqrt(c / (a_ * alpha_zero + b_));
+}
+}  // namespace tobas
