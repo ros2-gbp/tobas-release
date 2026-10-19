@@ -1,0 +1,151 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#pragma once
+
+#include <tobas_std_tools/geometry.hpp>
+
+#include "./angle_axis.hpp"
+#include "./quaternion.hpp"
+#include "./rotation.hpp"
+#include "./vector.hpp"
+
+namespace tobas
+{
+namespace kdl
+{
+/**
+ * @brief ZYX Euler angles.
+ */
+class Euler
+{
+public:
+  double roll, pitch, yaw;
+
+  inline explicit Euler();
+  inline explicit Euler(double roll, double pitch, double yaw);
+  inline explicit Euler(const Vector& rpy);
+  inline explicit Euler(const Rotation& rot);
+
+  static inline Euler Zero();
+
+  inline Euler clone() const;
+
+  inline void setZero();
+  inline void setNaN();
+
+  inline void set(double roll, double pitch, double yaw);
+
+  inline void fill(double value);
+
+  inline Rotation toRotation() const;
+  inline Quaternion toQuaternion() const;
+  inline Vector toAngleAxis() const;
+
+  /* Return the difference between two rotations as an equivalent angle-axis `Vector`.
+   * `O_AngleAxis_AB = O_Rot_B - O_Rot_A`. */
+  inline AngleAxis operator-(const Euler& rhs) const;
+
+  /* Rotate a 3D `Vector`. */
+  inline Vector operator*(const Vector& v) const;
+
+  /* Apply the inverse rotation to a 3D `Vector`. */
+  inline Vector inverse(const Vector& v) const;
+
+  inline bool isFinite() const;
+
+  inline friend std::ostream& operator<<(std::ostream& os, const Euler& arg);
+};
+
+inline Euler::Euler() : roll(0), pitch(0), yaw(0)
+{
+}
+
+inline Euler::Euler(double _roll, double _pitch, double _yaw) : roll(_roll), pitch(_pitch), yaw(_yaw)
+{
+}
+
+inline Euler::Euler(const Vector& rpy) : roll(rpy.x()), pitch(rpy.y()), yaw(rpy.z())
+{
+}
+
+inline Euler::Euler(const Rotation& rot)
+{
+  rot.getRPY(roll, pitch, yaw);
+}
+
+inline Euler Euler::Zero()
+{
+  return Euler(0.0, 0.0, 0.0);
+}
+
+inline Euler Euler::clone() const
+{
+  return *this;
+}
+
+inline void Euler::setZero()
+{
+  fill(0.0);
+}
+
+inline void Euler::setNaN()
+{
+  fill(NAN);
+}
+
+inline void Euler::set(double _roll, double _pitch, double _yaw)
+{
+  roll = _roll;
+  pitch = _pitch;
+  yaw = _yaw;
+}
+
+inline void Euler::fill(double value)
+{
+  set(value, value, value);
+}
+
+inline Rotation Euler::toRotation() const
+{
+  return Rotation::RPY(roll, pitch, yaw);
+}
+
+inline Vector Euler::toAngleAxis() const
+{
+  return toRotation().getRot();
+}
+
+inline Quaternion Euler::toQuaternion() const
+{
+  const auto [x, y, z, w] = st::quaternionFromEuler(roll, pitch, yaw);
+  return Quaternion(x, y, z, w);
+}
+
+inline AngleAxis Euler::operator-(const Euler& rhs) const
+{
+  return AngleAxis((toRotation() * rhs.toRotation().inverse()).getRot());
+}
+
+inline Vector Euler::operator*(const Vector& v) const
+{
+  return Rotation::RPY(roll, pitch, yaw) * v;
+}
+
+inline Vector Euler::inverse(const Vector& v) const
+{
+  return Rotation::RPY(roll, pitch, yaw).inverse(v);
+}
+
+inline bool Euler::isFinite() const
+{
+  return std::isfinite(roll) && std::isfinite(pitch) && std::isfinite(yaw);
+}
+
+inline std::ostream& operator<<(std::ostream& os, const Euler& arg)
+{
+  os << "roll: " << arg.roll << ", pitch: " << arg.pitch << ", yaw: " << arg.yaw;
+  return os;
+}
+}  // namespace kdl
+}  // namespace tobas
