@@ -1,0 +1,47 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#pragma once
+
+#include "./jntarray.hpp"
+#include "./tree_solver_i.hpp"
+
+namespace tobas
+{
+namespace kdl
+{
+/**
+ * @brief Compute the `Jd qd` term in `xdd = J qd + Jd qd`.
+ * `Jd qd` can be obtained by running the forward propagation of RNE with `qdd = 0` and `grav = 0`.
+ *
+ * cf. `tree_id_solver_rne.cpp`
+ */
+class TreeJacAccSolver : public TreeSolverI
+{
+  using super = TreeSolverI;
+
+public:
+  explicit TreeJacAccSolver(const Tree& tree);
+
+  bool updateInternalDataStructures() override;
+
+  int jntToCart(const JntArray& q, const JntArray& qd);
+
+  inline const Accel& getJdqd(const std::string& seg_name) const;
+
+private:
+  RotationMap R_;
+  TwistMap v_;
+  AccelMap a_;
+  AccelMap Jdqd_out_;
+
+  void initialize();
+  void jntToCartRec(const SegmentMap::const_iterator& segment, const JntArray& q, const JntArray& qd);
+};
+
+inline const Accel& TreeJacAccSolver::getJdqd(const std::string& seg_name) const
+{
+  return Jdqd_out_.at(seg_name);
+}
+}  // namespace kdl
+}  // namespace tobas
