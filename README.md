@@ -1,59 +1,46 @@
-![Tobas](./docs/docs/assets/brand/logo_black.png#gh-light-mode-only)
-![Tobas](./docs/docs/assets/brand/logo_white.png#gh-dark-mode-only)
+# tobas_geographic
 
-[![Latest version](https://img.shields.io/github/v/release/TobasFlightControl/tobas)](https://github.com/TobasFlightControl/tobas/releases)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+This package delegates geographic coordinate conversions and geomagnetic field calculations to
+[GeographicLib](https://geographiclib.sourceforge.io/).
 
-Tobas is a Linux-based, model-based flight controller for drones and robotic aircraft.
-It designs control systems from each airframe's physical model,
-so unconventional aircraft can be simulated, configured, and flown through the same ROS 2 interface.
+The bundled WMM2025 data files were generated and distributed by the GeographicLib project
+from the NOAA World Magnetic Model 2025 coefficients.
+WMM2025 is valid from 2025 through 2030.
+Evaluating the magnetic field after the model's `MaxTime` emits one warning per `Geography` instance,
+while the calculation continues with the expired model.
 
-## Quick Links
+## Magnetic model data
 
-| Purpose                  | Document                                                                                              |
-| ------------------------ | ----------------------------------------------------------------------------------------------------- |
-| Use Tobas                | [Tobas User Guide](https://tobasflightcontrol.github.io/tobas/latest/)                                |
-| Install Tobas            | [Installation Guide](https://tobasflightcontrol.github.io/tobas/latest/getting_started/installation/) |
-| Build from source        | [Setup](./SETUP.md)                                                                                   |
-| Contribute changes       | [Contributing to Tobas](./CONTRIBUTING.md)                                                            |
-| Edit the documentation   | [Documentation README](./docs/README.md)                                                              |
-| Review licensing options | [Commercial License](./COMMERCIAL-LICENSE.md)                                                         |
+The files under `data/magnetic` are GeographicLib's native magnetic-model dataset, not the raw `WMM.COF` file published by NOAA.
+The GeographicLib project distributes the converted WMM2025 dataset as
+[`wmm2025.tar.bz2`](https://sourceforge.net/projects/geographiclib/files/magnetic-distrib/wmm2025.tar.bz2/download).
+The underlying model is documented on the
+[NOAA World Magnetic Model](https://www.ncei.noaa.gov/products/world-magnetic-model) page.
 
-## Supported Platform
+### Refreshing WMM2025
 
-- Ubuntu 24.04 LTS
-- ROS 2 Jazzy
-- Debian Trixie for flight-controller images
+Install `geographiclib-tools`, which provides `geographiclib-get-magnetic`,
+and run the following commands from this package directory:
 
-## Repository Layout
+```sh
+geographiclib-get-magnetic -p data -f wmm2025
+```
 
-- `docs`: MkDocs-based user and developer documentation.
-- `tobas_core`: Core flight-control, estimation, hardware, message, failsafe, and utility packages.
-- `tobas_gui`: Setup, ground-station, simulation, tuning, and visualization tools.
-- `tobas_examples`: Example packages and code-style references.
-- `tobas_dev_tools`: Development, synchronization, and deployment helper scripts.
-- `tobas_deb`: Debian packaging resources for supported images.
-- `tobas_external`: Third-party libraries wrapped for the Tobas workspace.
+The `-p data` option makes the tool install the dataset in `data/magnetic`.
+The `-f` option forces a fresh download and also allows newer models that an older version of the helper script might not list yet.
+The command should update both `wmm2025.wmm` and `wmm2025.wmm.cof`.
 
-## For Contributors
+Review the metadata in `wmm2025.wmm`, especially `Epoch`, `MinTime`, `MaxTime`, `ReleaseDate`, and `DataVersion`,
+before committing the updated files.
 
-See [Contributing to Tobas](./CONTRIBUTING.md) for source setup, code style, pre-commit checks, and Git guidelines.
+### Switching to a future WMM release
 
-## License
+When a new WMM replaces WMM2025:
 
-Unless otherwise noted, this repository is licensed under the GNU General Public License,
-version 3 or any later version (GPL-3.0-or-later).
+1. Download it with `geographiclib-get-magnetic -p data -f <model-name>`.
+2. Change the model name passed to `GeographicLib::MagneticModel` in `src/geography.cpp`.
+3. Update the model name, source link, and validity period in this README.
+4. Remove the superseded dataset after confirming that no consumer still uses it.
 
-The `*_msgs` packages, including their `.msg`, `.srv`, and `.action` files,
-are licensed under Apache-2.0.
-
-See [LICENSE](./LICENSE) for the default open source license,
-and [LICENSES/Apache-2.0.txt](./LICENSES/Apache-2.0.txt) for the Apache-2.0 license text.
-
-If you want to distribute Tobas as part of a proprietary product,
-or if you do not wish to comply with the GPL for distribution,
-alternative commercial licensing is available from Tobas.
-
-See [COMMERCIAL-LICENSE.md](./COMMERCIAL-LICENSE.md) for commercial licensing information.
-
-For commercial licensing inquiries, please contact: contact@tobas.jp
+The complete set of GeographicLib magnetic datasets is available from the
+[GeographicLib magnetic-model distribution](https://sourceforge.net/projects/geographiclib/files/magnetic-distrib/).
