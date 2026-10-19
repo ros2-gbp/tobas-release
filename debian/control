@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-urdf-builder-plugin
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), qtbase5-dev, ros-jazzy-ament-cmake, ros-jazzy-rviz-common, ros-jazzy-rviz-default-plugins, ros-jazzy-rviz-rendering, ros-jazzy-tobas-constants, ros-jazzy-tobas-property-client, ros-jazzy-tobas-qt-tools, ros-jazzy-tobas-ros2-tools, ros-jazzy-tobas-std-tools, ros-jazzy-tobas-urdf, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_urdf_builder_plugin/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-urdf-builder-plugin
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, qtbase5-dev, ros-jazzy-rviz-common, ros-jazzy-rviz-default-plugins, ros-jazzy-rviz-rendering, ros-jazzy-tobas-constants, ros-jazzy-tobas-property-client, ros-jazzy-tobas-qt-tools, ros-jazzy-tobas-ros2-tools, ros-jazzy-tobas-std-tools, ros-jazzy-tobas-urdf, ros-jazzy-ros-workspace
+Description: RViz panel plugin for interactively building and editing URDF robot models.
