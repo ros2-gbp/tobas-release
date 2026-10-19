@@ -1,59 +1,51 @@
-![Tobas](./docs/docs/assets/brand/logo_black.png#gh-light-mode-only)
-![Tobas](./docs/docs/assets/brand/logo_white.png#gh-dark-mode-only)
+# tobas_rapidcsv_vendor
 
-[![Latest version](https://img.shields.io/github/v/release/TobasFlightControl/tobas)](https://github.com/TobasFlightControl/tobas/releases)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+This package provides the header-only [rapidcsv](https://github.com/d99kris/rapidcsv) CSV parser
+as an exported CMake interface target.
 
-Tobas is a Linux-based, model-based flight controller for drones and robotic aircraft.
-It designs control systems from each airframe's physical model,
-so unconventional aircraft can be simulated, configured, and flown through the same ROS 2 interface.
+## Vendored release
 
-## Quick Links
+- Upstream tag: [`v8.99`](https://github.com/d99kris/rapidcsv/releases/tag/v8.99)
+- Upstream commit: `68f57cc6c83d5e0992904398822453489d8dfac1`
+- Source archive SHA-256: `fbbf738483e31e788dc7b37af5a899db7314be416400f7d87b9d771dd5ebac03`
+- License: BSD-3-Clause; see `vendor/rapidcsv/LICENSE`
 
-| Purpose                  | Document                                                                                              |
-| ------------------------ | ----------------------------------------------------------------------------------------------------- |
-| Use Tobas                | [Tobas User Guide](https://tobasflightcontrol.github.io/tobas/latest/)                                |
-| Install Tobas            | [Installation Guide](https://tobasflightcontrol.github.io/tobas/latest/getting_started/installation/) |
-| Build from source        | [Setup](./SETUP.md)                                                                                   |
-| Contribute changes       | [Contributing to Tobas](./CONTRIBUTING.md)                                                            |
-| Edit the documentation   | [Documentation README](./docs/README.md)                                                              |
-| Review licensing options | [Commercial License](./COMMERCIAL-LICENSE.md)                                                         |
+Only the public `src/rapidcsv.h` header is vendored.
 
-## Supported Platform
+## Updating the vendored source
 
-- Ubuntu 24.04 LTS
-- ROS 2 Jazzy
-- Debian Trixie for flight-controller images
+1. Find the latest stable tag on the [upstream releases page](https://github.com/d99kris/rapidcsv/releases/latest),
+   and set `UPSTREAM_TAG` below to that exact tag.
 
-## Repository Layout
+2. From this package directory, download and extract the corresponding source archive:
 
-- `docs`: MkDocs-based user and developer documentation.
-- `tobas_core`: Core flight-control, estimation, hardware, message, failsafe, and utility packages.
-- `tobas_gui`: Setup, ground-station, simulation, tuning, and visualization tools.
-- `tobas_examples`: Example packages and code-style references.
-- `tobas_dev_tools`: Development, synchronization, and deployment helper scripts.
-- `tobas_deb`: Debian packaging resources for supported images.
-- `tobas_external`: Third-party libraries wrapped for the Tobas workspace.
+   ```bash
+   UPSTREAM_TAG=v8.99
+   UPDATE_DIR=$(mktemp -d)
+   curl -L \
+     -o "${UPDATE_DIR}/rapidcsv-${UPSTREAM_TAG}.tar.gz" \
+     "https://github.com/d99kris/rapidcsv/archive/refs/tags/${UPSTREAM_TAG}.tar.gz"
+   tar -xzf "${UPDATE_DIR}/rapidcsv-${UPSTREAM_TAG}.tar.gz" -C "${UPDATE_DIR}"
+   sha256sum "${UPDATE_DIR}/rapidcsv-${UPSTREAM_TAG}.tar.gz"
+   ```
 
-## For Contributors
+3. Replace the public header and license:
 
-See [Contributing to Tobas](./CONTRIBUTING.md) for source setup, code style, pre-commit checks, and Git guidelines.
+   ```bash
+   UPSTREAM_DIR="${UPDATE_DIR}/rapidcsv-${UPSTREAM_TAG#v}"
+   install -m 0644 "${UPSTREAM_DIR}/src/rapidcsv.h" vendor/rapidcsv/rapidcsv.h
+   install -m 0644 "${UPSTREAM_DIR}/LICENSE" vendor/rapidcsv/LICENSE
+   ```
 
-## License
+4. Update the tag, commit, and archive SHA-256 in the **Vendored release** section. Obtain the tag commit with:
 
-Unless otherwise noted, this repository is licensed under the GNU General Public License,
-version 3 or any later version (GPL-3.0-or-later).
+   ```bash
+   git ls-remote https://github.com/d99kris/rapidcsv.git "refs/tags/${UPSTREAM_TAG}" "refs/tags/${UPSTREAM_TAG}^{}"
+   ```
 
-The `*_msgs` packages, including their `.msg`, `.srv`, and `.action` files,
-are licensed under Apache-2.0.
+5. Review the upstream changes and license, then validate the package and its consumer:
 
-See [LICENSE](./LICENSE) for the default open source license,
-and [LICENSES/Apache-2.0.txt](./LICENSES/Apache-2.0.txt) for the Apache-2.0 license text.
-
-If you want to distribute Tobas as part of a proprietary product,
-or if you do not wish to comply with the GPL for distribution,
-alternative commercial licensing is available from Tobas.
-
-See [COMMERCIAL-LICENSE.md](./COMMERCIAL-LICENSE.md) for commercial licensing information.
-
-For commercial licensing inquiries, please contact: contact@tobas.jp
+   ```bash
+   pre-commit run --files CMakeLists.txt package.xml README.md
+   colcon build --packages-up-to tobas_setup_assistant
+   ```
