@@ -1,0 +1,83 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#pragma once
+
+#include <cstdint>
+
+namespace tobas
+{
+namespace qt
+{
+class RGBColor
+{
+public:
+  uint8_t r, g, b;
+
+  constexpr explicit RGBColor(uint8_t _r, uint8_t _g, uint8_t _b);
+
+  static constexpr RGBColor Black();
+  static constexpr RGBColor White();
+  static constexpr RGBColor Gray();
+  static constexpr RGBColor Blue();
+  static constexpr RGBColor Green();
+  static constexpr RGBColor Orange();
+  static constexpr RGBColor Purple();
+  static constexpr RGBColor Red();
+  static constexpr RGBColor Yellow();
+
+  RGBColor mean(const RGBColor& other) const;
+
+  bool operator==(const RGBColor& rhs) const;
+};
+
+constexpr RGBColor::RGBColor(uint8_t _r, uint8_t _g, uint8_t _b) : r(_r), g(_g), b(_b)
+{
+}
+
+constexpr RGBColor RGBColor::Black()
+{
+  return RGBColor(0, 0, 0);
+}
+
+constexpr RGBColor RGBColor::Gray()
+{
+  return RGBColor(128, 128, 128);
+}
+
+constexpr RGBColor RGBColor::White()
+{
+  return RGBColor(255, 255, 255);
+}
+
+constexpr RGBColor RGBColor::Blue()
+{
+  return RGBColor(115, 206, 244);
+}
+
+constexpr RGBColor RGBColor::Green()
+{
+  return RGBColor(173, 255, 47);
+}
+
+constexpr RGBColor RGBColor::Orange()
+{
+  return RGBColor(255, 165, 0);
+}
+
+constexpr RGBColor RGBColor::Purple()
+{
+  return RGBColor(175, 0, 255);
+}
+
+constexpr RGBColor RGBColor::Red()
+{
+  return RGBColor(244, 55, 83);
+}
+
+constexpr RGBColor RGBColor::Yellow()
+{
+  return RGBColor(255, 255, 0);
+}
+}  // namespace qt
+}  // namespace tobas

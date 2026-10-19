@@ -1,0 +1,433 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#include <tobas_constants/ros_interface.hpp>
+#include <tobas_kdl/tree_active_joints_extractor.hpp>
+#include <tobas_kdl/tree_jntspace_pid.hpp>
+#include <tobas_kdl/tree_joint_parser.hpp>
+#include <tobas_kdl/tree_taskspace_pid.hpp>
+#include <tobas_kdl_conversions/kdl_msg.hpp>
+#include <tobas_node/node.hpp>
+#include <tobas_ros2_tools/tf_listener.hpp>
+#include <tobas_tools/tree_joint_state_converter.hpp>
+
+#include <tobas_drone_msgs_adapter/drone.hpp>
+#include <tobas_kdl_msgs_adapter/tree.hpp>
+#include <tobas_msgs/msg/joint_command_array.hpp>
+#include <tobas_msgs_adapter/link_state_array.hpp>
+
+#include "tobas_manipulation/constants.hpp"
+#include "tobas_manipulation/util.hpp"
+
+using namespace std::chrono_literals;
+
+namespace tobas
+{
+namespace manipulation
+{
+class EffortControllerNode : public BaseNode
+{
+  using self = EffortControllerNode;
+  using super = BaseNode;
+
+public:
+  explicit EffortControllerNode(const rclcpp::NodeOptions& options = rclcpp::NodeOptions());
+
+private:
+  // Parameters
+  std::unordered_set<std::string> jnt_names_;
+
+  Drone::ConstSharedPtr drone_;
+  kdl::Tree tree_;
+
+  kdl::TreeJointParser jnt_parser_;
+  kdl::TreeActiveJointsExtractor active_jnts_extractor_;
+  kdl::TreeJntSpacePID pid_js_;
+  kdl::TreeTaskSpacePID pid_ts_;
+  TreeJointStateConverter cur_js_conv_;
+  TreeJointStateConverter tar_js_conv_;
+
+  ros2::TransformListener::SharedPtr tf_listener_;
+  tobas_msgs::msg::JointStateArray home_js_;
+
+  tobas_msgs::msg::JointStateArray::ConstSharedPtr tar_js_;
+  tobas_msgs::LinkStateArray::ConstSharedPtr tar_ls_;
+
+  // Publishers
+  ros2::PublisherPtr<tobas_msgs::msg::JointCommandArray> efforts_pub_;
+
+  // Subscribers
+  ros2::SubscriberPtr<Drone> drone_sub_;
+  ros2::SubscriberPtr<kdl::Tree> tree_sub_;
+  ros2::SubscriberPtr<tobas_msgs::msg::JointStateArray> cur_js_sub_;
+  ros2::SubscriberPtr<tobas_msgs::msg::JointStateArray> tar_js_sub_;
+  ros2::SubscriberPtr<tobas_msgs::LinkStateArray> tar_ls_sub_;
+
+  // Timer
+  ros2::TimerPtr initialize_timer_;
+  ros2::TimerPtr auto_reset_timer_;
+
+  void initialize();
+
+  bool jointSpaceControl(
+    const tobas_msgs::msg::JointStateArray& cur_js,
+    const tobas_msgs::msg::JointStateArray& tar_js,
+    tobas_msgs::msg::JointCommandArray& efforts_msg);
+  bool taskSpaceControl(
+    const tobas_msgs::msg::JointStateArray& cur_js,
+    const tobas_msgs::LinkStateArray& tar_ls,
+    tobas_msgs::msg::JointCommandArray& efforts_msg);
+
+  bool jointStiffnessCb(const long& p);
+  bool jointDamping(const long& p);
+  bool linearStiffnessCb(const long& p);
+  bool angularStiffnessCb(const long& p);
+  bool linearDampingCb(const long& p);
+  bool angularDampingCb(const long& p);
+
+  void droneCb(const Drone::ConstSharedPtr& drone);
+  void treeCb(const kdl::Tree::ConstSharedPtr& tree);
+  void currentJointStateCb(const tobas_msgs::msg::JointStateArray::ConstSharedPtr& cur_js);
+  void targetJointStateCb(const tobas_msgs::msg::JointStateArray::ConstSharedPtr& tar_js);
+  void targetLinkStateCb(const tobas_msgs::LinkStateArray::ConstSharedPtr& tar_ls);
+
+  void autoResetTimerCb();
+};
+
+EffortControllerNode::EffortControllerNode(const rclcpp::NodeOptions& options)
+  : super("jointeff_trajectory_controller", nodeOptions_DParam(options))
+  , jnt_parser_(tree_)
+  , active_jnts_extractor_(tree_)
+  , pid_js_(tree_)
+  , pid_ts_(tree_)
+  , cur_js_conv_(tree_)
+  , tar_js_conv_(tree_)
+{
+  initialize_timer_ = createTimer(0s, &self::initialize, this);
+}
+
+void EffortControllerNode::initialize()
+{
+  const auto jnt_names = getStringArrayParam("joint_names", {});
+  if (jnt_names.empty()) {
+    TOBAS_ERROR("Joint names are not specified.");
+    return;
+  }
+  jnt_names_.insert(jnt_names.begin(), jnt_names.end());
+
+  // `shared_from_this` cannot be called from the constructor.
+  tf_listener_ = std::make_shared<ros2::TransformListener>(shared_from_this());
+
+  addDynamicIntParam("joint_stiffness", &self::jointStiffnessCb, this, 5, 5, 1, 20);
+  addDynamicIntParam("joint_damping", &self::jointDamping, this, 1, 10, 1, 20);
+  addDynamicIntParam("linear_stiffness", &self::linearStiffnessCb, this, 5, 5, 1, 20);
+  addDynamicIntParam("angular_stiffness", &self::angularStiffnessCb, this, 5, 5, 1, 20);
+  addDynamicIntParam("linear_damping", &self::linearDampingCb, this, 1, 10, 1, 20);
+  addDynamicIntParam("angular_damping", &self::angularDampingCb, this, 1, 10, 1, 20);
+
+  efforts_pub_ = createPublisher<tobas_msgs::msg::JointCommandArray>(topic::kJointEffCmd);
+
+  drone_sub_ = createSubscriber(topic::kDrone, &self::droneCb, this, true, true);
+  tree_sub_ = createSubscriber(topic::kKdlTree, &self::treeCb, this, true, true);
+  cur_js_sub_ = createSubscriber(topic::kJointStates, &self::currentJointStateCb, this);
+  tar_js_sub_ = createSubscriber(topic::kEffCtrlJS, &self::targetJointStateCb, this);
+  tar_ls_sub_ = createSubscriber(topic::kEffCtrlLS, &self::targetLinkStateCb, this);
+
+  auto_reset_timer_ = createTimer(manipulation::kAutoResetTimeThresh, &self::autoResetTimerCb, this, false);
+
+  initialize_timer_->cancel();
+}
+
+bool EffortControllerNode::jointSpaceControl(
+  const tobas_msgs::msg::JointStateArray& cur_js,
+  const tobas_msgs::msg::JointStateArray& tar_js,
+  tobas_msgs::msg::JointCommandArray& efforts_msg)
+{
+  // JointState -> JntArray
+  if (cur_js_conv_.convert(cur_js) < 0) {
+    TOBAS_ERROR("Failed to convert current JointState to Jntarray: ", cur_js_conv_.errorMessage());
+    return false;
+  }
+  if (tar_js_conv_.convert(tar_js) < 0) {
+    TOBAS_ERROR("Failed to convert target JointState to Jntarray: ", tar_js_conv_.errorMessage());
+    return false;
+  }
+
+  const auto& cur_q = cur_js_conv_.getPosition();
+  const auto& cur_qd = cur_js_conv_.getVelocity();
+  const auto& tar_q = tar_js_conv_.getPosition();
+  const auto& tar_qd = tar_js_conv_.getVelocity();
+
+  // Calculate joint torques with PID.
+  if (pid_js_.cartToJnt(cur_q, cur_qd, tar_q, tar_qd) < 0) {
+    TOBAS_ERROR("Joint space PID failed: ", pid_js_.errorMessage());
+    return false;
+  }
+  const auto efforts = tar_js_conv_.getEffort() + pid_js_.getEfforts();  // FF + FB
+
+  // Fill output message.
+  for (const auto& tar_state : tar_js.states) {
+    const auto& jnt_name = tar_state.name;
+    if (!jnt_names_.contains(jnt_name)) {
+      TOBAS_ERROR("The target joint \"", jnt_name, "\" is not included in the joint group.");
+      return false;
+    }
+    efforts_msg.commands.emplace_back();
+    efforts_msg.commands.back().name = jnt_name;
+    efforts_msg.commands.back().data = efforts(jnt_parser_.jointIndex(jnt_name));
+  }
+
+  return true;
+}
+
+bool EffortControllerNode::taskSpaceControl(
+  const tobas_msgs::msg::JointStateArray& cur_js,
+  const tobas_msgs::LinkStateArray& tar_ls,
+  tobas_msgs::msg::JointCommandArray& efforts_msg)
+{
+  // JointState -> JntArray
+  if (cur_js_conv_.convert(cur_js) < 0) {
+    TOBAS_ERROR("Failed to convert current JointState to Jntarray: ", cur_js_conv_.errorMessage());
+    return false;
+  }
+
+  // Update task-space target values.
+  kdl::Frame T_Base_Parent;
+  kdl::FrameMap tar_p;
+  kdl::TwistMap tar_v;
+  kdl::AccelMap a_ff;
+  kdl::WrenchMap f_ext;
+  for (const auto& ls : tar_ls.states) {
+    if (!tf_listener_->lookupTransform(tree_.getRootName(), tar_ls.header.frame_id)) {
+      TOBAS_ERROR(tf_listener_->getErrorMessage());
+      continue;
+    }
+
+    // Convert values expressed in the parent frame to values expressed in the base link.
+    kdl::transformMsgToKDL(tf_listener_->getTransform().transform, T_Base_Parent);
+    tar_p[ls.name] = T_Base_Parent * ls.frame;
+    tar_v[ls.name] = T_Base_Parent.M * ls.twist;
+    a_ff[ls.name] = T_Base_Parent.M * ls.accel;
+    f_ext[ls.name] = T_Base_Parent.M * ls.wrench;
+  }
+
+  // Calculate joint torques with PID.
+  const auto& cur_q = cur_js_conv_.getPosition();
+  const auto& cur_qd = cur_js_conv_.getVelocity();
+  if (pid_ts_.cartToJnt(cur_q, cur_qd, tar_p, tar_v, a_ff, f_ext) < 0) {
+    TOBAS_ERROR("Cartesian PID failed: ", pid_ts_.errorMessage());
+    return false;
+  }
+  const auto& efforts = pid_ts_.getEfforts();
+
+  // JntArray -> JointState
+  active_jnts_extractor_.solve(manipulation::linkNames(tar_ls));
+  const auto& active_jnt_names = active_jnts_extractor_.activeJointNames();
+
+  // Fill output message.
+  for (const auto& jnt_name : active_jnt_names) {
+    if (!jnt_names_.contains(jnt_name)) {
+      TOBAS_ERROR("The target joint \"", jnt_name, "\" is not included in the joint group.");
+      return false;
+    }
+    efforts_msg.commands.emplace_back();
+    efforts_msg.commands.back().name = jnt_name;
+    efforts_msg.commands.back().data = efforts((jnt_parser_.jointIndex(jnt_name)));
+  }
+
+  return true;
+}
+
+bool EffortControllerNode::jointStiffnessCb(const long& p)
+{
+  if (!pid_js_.setStiffness(p)) {
+    TOBAS_ERROR("Failed to set joint stiffness.");
+    return false;
+  }
+
+  return true;
+}
+
+bool EffortControllerNode::jointDamping(const long& p)
+{
+  if (!pid_js_.setDamping(p)) {
+    TOBAS_ERROR("Failed to set joint damping.");
+    return false;
+  }
+
+  return true;
+}
+
+bool EffortControllerNode::linearStiffnessCb(const long& p)
+{
+  if (!pid_ts_.setLinearStiffness(p)) {
+    TOBAS_ERROR("Failed to set linear stiffness.");
+    return false;
+  }
+
+  return true;
+}
+
+bool EffortControllerNode::angularStiffnessCb(const long& p)
+{
+  if (!pid_ts_.setAngularStiffness(p)) {
+    TOBAS_ERROR("Failed to set angular stiffness.");
+    return false;
+  }
+
+  return true;
+}
+
+bool EffortControllerNode::linearDampingCb(const long& p)
+{
+  if (!pid_ts_.setLinearDamping(p)) {
+    TOBAS_ERROR("Failed to set linear damping.");
+    return false;
+  }
+
+  return true;
+}
+
+bool EffortControllerNode::angularDampingCb(const long& p)
+{
+  if (!pid_ts_.setAngularDamping(p)) {
+    TOBAS_ERROR("Failed to set angular damping.");
+    return false;
+  }
+
+  return true;
+}
+
+void EffortControllerNode::droneCb(const Drone::ConstSharedPtr& drone)
+{
+  drone_ = drone;
+
+  home_js_.states.clear();
+
+  // Get joint home positions.
+  for (const auto& jnt_name : jnt_names_) {
+    const auto joint_it = drone->joints.find(jnt_name);
+    if (joint_it == drone->joints.end()) {
+      TOBAS_WARN("The drone does not have joint \"", jnt_name, "\".");
+      continue;
+    }
+    const auto& joint = joint_it->second;
+    if (joint.cmd_iface != JointCommandInterface::kEffort) {
+      TOBAS_WARN("The command interface of joint \"", jnt_name, "\" is not effort.");
+      continue;
+    }
+    home_js_.states.emplace_back();
+    home_js_.states.back().name = jnt_name;
+    home_js_.states.back().position = joint.home_pos;
+  }
+
+  // Set home positions as the initial target state.
+  if (!home_js_.states.empty()) {
+    tar_js_ = std::make_shared<tobas_msgs::msg::JointStateArray>(home_js_);
+  }
+}
+
+void EffortControllerNode::treeCb(const kdl::Tree::ConstSharedPtr& tree)
+{
+  tree_ = *tree;
+
+  if (!jnt_parser_.updateInternalDataStructures()) {
+    TOBAS_ERROR("Failed to update internal data structures of joint parser.");
+    tree_.clear();
+    return;
+  }
+  if (!active_jnts_extractor_.updateInternalDataStructures()) {
+    TOBAS_ERROR("Failed to update internal data structures of active joints extractor.");
+    tree_.clear();
+    return;
+  }
+  if (!pid_js_.updateInternalDataStructures()) {
+    TOBAS_ERROR("Failed to update internal data structures of joint space PID.");
+    tree_.clear();
+    return;
+  }
+  if (!pid_ts_.updateInternalDataStructures()) {
+    TOBAS_ERROR("Failed to update internal data structures of task space PID.");
+    tree_.clear();
+    return;
+  }
+  if (!cur_js_conv_.updateInternalDataStructures()) {
+    TOBAS_ERROR("Failed to update internal data structures of the joint state converter for current joints.");
+    tree_.clear();
+    return;
+  }
+  if (!tar_js_conv_.updateInternalDataStructures()) {
+    TOBAS_ERROR("Failed to update internal data structures of the joint state converter for target joints.");
+    tree_.clear();
+    return;
+  }
+}
+
+void EffortControllerNode::currentJointStateCb(const tobas_msgs::msg::JointStateArray::ConstSharedPtr& cur_js)
+{
+  if (tree_.empty()) {
+    return;
+  }
+  if (home_js_.states.empty()) {
+    return;
+  }
+  if (!tar_js_ && !tar_ls_) {
+    return;
+  }
+
+  // Create joint efforts command.
+  auto efforts_msg = std::make_unique<tobas_msgs::msg::JointCommandArray>();
+  efforts_msg->header.stamp = cur_js->header.stamp;
+
+  // Joint space control or Task space control
+  if (tar_js_) {
+    if (!jointSpaceControl(*cur_js, *tar_js_, *efforts_msg)) {
+      return;
+    }
+  }
+  else if (tar_ls_) {
+    if (!taskSpaceControl(*cur_js, *tar_ls_, *efforts_msg)) {
+      return;
+    }
+  }
+  else {
+    TOBAS_ERROR("Both target joint state and target cartesian state are null.");
+    return;
+  }
+
+  // Publish joint efforts command.
+  efforts_pub_->publish(std::move(efforts_msg));
+}
+
+void EffortControllerNode::targetJointStateCb(const tobas_msgs::msg::JointStateArray::ConstSharedPtr& tar_js)
+{
+  tar_js_ = tar_js;
+  tar_ls_.reset();
+
+  auto_reset_timer_->reset();
+}
+
+void EffortControllerNode::targetLinkStateCb(const tobas_msgs::LinkStateArray::ConstSharedPtr& tar_ls)
+{
+  tar_ls_ = tar_ls;
+  tar_js_.reset();
+
+  auto_reset_timer_->reset();
+}
+
+void EffortControllerNode::autoResetTimerCb()
+{
+  tar_js_ = std::make_shared<tobas_msgs::msg::JointStateArray>(home_js_);
+  tar_ls_.reset();
+
+  TOBAS_WARN(
+    "The target joint states are automatically reset because ",
+    manipulation::kAutoResetTimeThresh,
+    " have elapsed since the last command.");
+
+  auto_reset_timer_->cancel();
+}
+}  // namespace manipulation
+}  // namespace tobas
+
+RCLCPP_COMPONENTS_REGISTER_NODE(tobas::manipulation::EffortControllerNode)
