@@ -1,0 +1,50 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#include "tobas_control_system/mission_planner/fields/takeoff_max_accel.hpp"
+
+#include <QHBoxLayout>
+
+namespace tobas
+{
+namespace gui
+{
+namespace ctrl
+{
+namespace field
+{
+TakeoffMaxAccelWidget::TakeoffMaxAccelWidget()
+{
+  // https://docs.px4.io/main/en/advanced_config/parameter_reference#MPC_ACC_UP_MAX
+  spin_box_ = new qt::DoubleSpinBox();
+  spin_box_->setDecimals(1);
+  spin_box_->setMinimum(1.0);
+  spin_box_->setMaximum(15.0);
+  spin_box_->setValue(4.0);
+  spin_box_->setSuffix(" m/s²");
+
+  const auto cols = new QHBoxLayout();
+  setLayout(cols);
+  cols->addWidget(spin_box_);
+
+  connect(spin_box_, qOverload<double>(&QDoubleSpinBox::valueChanged), this, &BaseFieldWidget::updated);
+}
+
+const char* TakeoffMaxAccelWidget::label() const
+{
+  return "Maximum Acceleration";
+}
+
+double TakeoffMaxAccelWidget::getValue() const
+{
+  return spin_box_->value();
+}
+
+void TakeoffMaxAccelWidget::setValue(double value)
+{
+  spin_box_->setValue(value);
+}
+}  // namespace field
+}  // namespace ctrl
+}  // namespace gui
+}  // namespace tobas
