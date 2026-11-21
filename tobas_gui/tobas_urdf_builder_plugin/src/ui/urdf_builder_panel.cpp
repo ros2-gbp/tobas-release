@@ -3,24 +3,25 @@
 
 #include "tobas_urdf_builder_plugin/ui/urdf_builder_panel.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <filesystem>
 
 #include <QMenu>
 #include <QMessageBox>
+#include <QScrollBar>
 #include <pluginlib/class_list_macros.hpp>
 #include <rviz_default_plugins/robot/robot.hpp>
 #include <rviz_default_plugins/robot/robot_link.hpp>
 
 #include <tobas_ros2_tools/util.hpp>
 
-#include "ui_urdf_builder_panel.h"
-
 #include "tobas_urdf_builder_plugin/ogre_helpers/static_link_updater.hpp"
 #include "tobas_urdf_builder_plugin/ui/add_link_dialog.hpp"
 #include "tobas_urdf_builder_plugin/ui/save_urdf_dialog.hpp"
 #include "tobas_urdf_builder_plugin/ui/update_link_dialog.hpp"
 #include "tobas_urdf_builder_plugin/utils/widget_item.hpp"
+#include "ui_urdf_builder_panel.h"
 
 #define ROBOT_MODEL_UPDATE_INTERVAL 10  // [ms]
 #define INVALID_CHARS " '\"#$%&()^~|,.<>/\\!?"
@@ -52,6 +53,9 @@ UrdfBuilderPanel::UrdfBuilderPanel(QWidget* parent)
   link_dialog_ = new UpdateLinkDialog(node_, this);
   link_dialog_->hide();
   ui_->scrollAreaWidgetContents->layout()->addWidget(link_dialog_);
+
+  // Recalculate the required width when the link editor's layout changes.
+  ui_->scrollAreaWidgetContents->installEventFilter(this);
 
   defineConnections();
 }
@@ -87,6 +91,21 @@ QStringList UrdfBuilderPanel::linkNames() const
 QStringList UrdfBuilderPanel::jointNames() const
 {
   return vm_.jointNames();
+}
+
+bool UrdfBuilderPanel::eventFilter(QObject* watched, QEvent* event)
+{
+  if (watched == ui_->scrollAreaWidgetContents && event->type() == QEvent::LayoutRequest) {
+    // Keep every field visible horizontally, including when a vertical scrollbar takes up space.
+    // Reserve the editor's width even before a root link is created and the editor becomes visible.
+    const auto margins = ui_->scrollAreaWidgetContents->layout()->contentsMargins();
+    const auto editor_width = link_dialog_->minimumSizeHint().width() + margins.left() + margins.right();
+    const auto content_width = std::max(ui_->scrollAreaWidgetContents->minimumSizeHint().width(), editor_width);
+    const auto scrollbar_width = ui_->ScrollArea->verticalScrollBar()->sizeHint().width();
+    ui_->ScrollArea->setMinimumWidth(content_width + 2 * ui_->ScrollArea->frameWidth() + scrollbar_width);
+  }
+
+  return Panel::eventFilter(watched, event);
 }
 
 void UrdfBuilderPanel::onRobotNameTextChanged(const QString& name)
