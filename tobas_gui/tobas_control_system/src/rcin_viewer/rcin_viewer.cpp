@@ -24,34 +24,37 @@ RCInputViewerWidget::RCInputViewerWidget(const RosQtBridge& bridge)
   yaw_pitch_ = new StickPanel("Yaw / Pitch", "Yaw", "Pitch");
   roll_throttle_ = new StickPanel("Roll / Throttle", "Roll", "Throttle");
 
-  enable_ = makeBadge("---");
   kill_ = makeBadge("Kill: ---");
   sub_mode_ = makeBadge("Sub: ---");
-  acrobat_ = makeBadge("Acrobat");
-  stabilize_ = makeBadge("Stabilize");
-  loiter_ = makeBadge("Loiter");
+  acrobat_ = makeBadge("Acro");
+  acrobat_->setToolTip("Acrobat");
+  stabilize_ = makeBadge("Stab");
+  stabilize_->setToolTip("Stabilize");
+  loiter_ = makeBadge("Loit");
+  loiter_->setToolTip("Loiter");
 
   // Layout
   const auto switch_cols = new QHBoxLayout();
   switch_cols->addWidget(kill_, 1);
   switch_cols->addWidget(sub_mode_, 1);
 
-  const auto mode_rows = new QVBoxLayout();
-  qt::addWidgetCenter(new QLabel("Flight Mode"), mode_rows);
-  mode_rows->addWidget(acrobat_);
-  mode_rows->addWidget(stabilize_);
-  mode_rows->addWidget(loiter_);
+  const auto mode_cols = new QHBoxLayout();
+  mode_cols->setSpacing(0);
+  mode_cols->addWidget(acrobat_, 1);
+  mode_cols->addWidget(stabilize_, 1);
+  mode_cols->addWidget(loiter_, 1);
 
   const auto status_rows = new QVBoxLayout();
-  status_rows->addWidget(enable_);
-  status_rows->addLayout(switch_cols);
-  status_rows->addStretch();
-  status_rows->addLayout(mode_rows);
+  status_rows->setSpacing(0);
+  status_rows->addLayout(switch_cols, 5);
+  status_rows->addLayout(mode_cols, 8);
 
   const auto cols = new QHBoxLayout();
-  cols->addWidget(yaw_pitch_, 1);
-  cols->addWidget(roll_throttle_, 1);
-  cols->addLayout(status_rows);
+  cols->setContentsMargins(2, 0, 2, 0);
+  cols->setSpacing(4);
+  cols->addWidget(yaw_pitch_, 3);
+  cols->addWidget(roll_throttle_, 3);
+  cols->addLayout(status_rows, 1);
   setLayout(cols);
 
   // Connection
@@ -62,7 +65,6 @@ void RCInputViewerWidget::reset()
 {
   yaw_pitch_->reset();
   roll_throttle_->reset();
-  setBadge(enable_, "---", qt::color::gray90());
   setBadge(kill_, "Kill: ---", qt::color::gray90());
   setBadge(sub_mode_, "Sub: ---", qt::color::gray90());
   setMode(static_cast<FlightMode>(-1));
@@ -74,8 +76,7 @@ QLabel* RCInputViewerWidget::makeBadge(const QString& text) const
   badge->setAlignment(Qt::AlignCenter);
   badge->setAutoFillBackground(true);
   badge->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-  badge->setMinimumHeight(30);
-  badge->setMinimumWidth(70);
+  badge->setMinimumWidth(44);
   return badge;
 }
 
@@ -91,9 +92,9 @@ void RCInputViewerWidget::setBadge(QLabel* badge, const QString& text, const QCo
 
 void RCInputViewerWidget::setMode(FlightMode mode)
 {
-  setBadge(acrobat_, "Acrobat", mode == FlightMode::kAcrobat ? qt::color::lightBlue() : qt::color::gray90());
-  setBadge(stabilize_, "Stabilize", mode == FlightMode::kStabilize ? qt::color::lightBlue() : qt::color::gray90());
-  setBadge(loiter_, "Loiter", mode == FlightMode::kLoiter ? qt::color::lightBlue() : qt::color::gray90());
+  setBadge(acrobat_, "Acro", mode == FlightMode::kAcrobat ? qt::color::lightBlue() : qt::color::gray90());
+  setBadge(stabilize_, "Stab", mode == FlightMode::kStabilize ? qt::color::lightBlue() : qt::color::gray90());
+  setBadge(loiter_, "Loit", mode == FlightMode::kLoiter ? qt::color::lightBlue() : qt::color::gray90());
 }
 
 void RCInputViewerWidget::rcInputCb(const tobas_msgs::RCInput::ConstSharedPtr& rcin)
@@ -105,14 +106,15 @@ void RCInputViewerWidget::rcInputCb(const tobas_msgs::RCInput::ConstSharedPtr& r
 
   yaw_pitch_->setValues(-rcin->yaw, rcin->pitch, true, rcin->enable);
   roll_throttle_->setValues(rcin->roll, rcin->throttle, true, rcin->enable);
-  setBadge(enable_, rcin->enable ? "Enabled" : "Disabled", rcin->enable ? qt::color::lightBlue() : qt::color::gray90());
   setBadge(
-    kill_, QString("Kill: ") + (rcin->kill ? "ON" : "OFF"), rcin->kill ? qt::color::lightRed() : qt::color::gray90());
+    kill_,
+    QString("Kill: ") + (rcin->kill ? "ON" : "OFF"),
+    rcin->enable && rcin->kill ? qt::color::lightRed() : qt::color::gray90());
   setBadge(
     sub_mode_,
     QString("Sub: ") + (rcin->sub_mode ? "ON" : "OFF"),
-    rcin->sub_mode ? qt::color::lightBlue() : qt::color::gray90());
-  setMode(rcin->mode);
+    rcin->enable && rcin->sub_mode ? qt::color::lightBlue() : qt::color::gray90());
+  setMode(rcin->enable ? rcin->mode : static_cast<FlightMode>(-1));
 }
 }  // namespace rcin
 }  // namespace ctrl
