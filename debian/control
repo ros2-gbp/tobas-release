@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-kdl-parser
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-tobas-kdl-conversions, ros-jazzy-tobas-urdf, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_kdl_parser/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-kdl-parser
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-tobas-kdl-conversions, ros-jazzy-tobas-urdf, ros-jazzy-ros-workspace
+Description: Parser that builds KDL robot models from URDF descriptions.
