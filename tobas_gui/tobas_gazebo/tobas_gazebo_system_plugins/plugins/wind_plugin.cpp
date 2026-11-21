@@ -1,0 +1,234 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#include <tobas_constants/frame.hpp>
+#include <tobas_gazebo_common/constants.hpp>
+#include <tobas_gazebo_conversions/gazebo_kdl.hpp>
+#include <tobas_gazebo_tools/utils.hpp>
+#include <tobas_math/definitions.hpp>
+#include <tobas_wind_model/dryden.hpp>
+
+#include <tobas_gazebo_msgs/srv/get_wind_params.hpp>
+#include <tobas_gazebo_msgs/srv/set_wind_params.hpp>
+#include <tobas_msgs_adapter/wind.hpp>
+
+#include "tobas_gazebo_system_plugins/common/common.hpp"
+
+namespace ch = std::chrono;
+namespace cmp = gz::sim::components;
+
+namespace tobas
+{
+namespace gazebo
+{
+/**
+ * @brief Modeling of Wind Phenomena and Analysis of Their Effects on UAV Trajectory Tracking
+ * Performance [Siqueira+, 2017]. Implements the four wind components.
+ *
+ * - Constant wind:
+ * - Turbulance: https://jp.mathworks.com/help/aeroblks/drydenwindturbulencemodeldiscrete.html
+ * - Wind gust: 1-cosine model (https://aero.w3.kanazawa-u.ac.jp/cgi-bin/wiki.cgi?page=DISTB)
+ * - Wind shear: // TODO: An overview of various kinds of wind effects on unmanned aerial vehicle
+ */
+class GazeboWindPlugin : public BaseNode,
+                         public gz::sim::System,
+                         public gz::sim::ISystemConfigure,
+                         public gz::sim::ISystemPostUpdate
+{
+  // Default parameters
+  static constexpr double kDefaultMeanWindSpeed = 0.0;          // [m/s]
+  static constexpr double kDefaultConstantWindDirection = 0.0;  // [rad]
+  static constexpr double kDefaultGustSpeedFactor = 1.0;        // [-]
+  static constexpr double kDefaultGustDuration = 5.0;           // [s]
+  static constexpr double kDefaultGustInterval = 10.0;          // [s]
+
+  using self = GazeboWindPlugin;
+  using GetSrv = tobas_gazebo_msgs::srv::GetWindParams;
+  using SetSrv = tobas_gazebo_msgs::srv::SetWindParams;
+
+public:
+  explicit GazeboWindPlugin();
+
+  void Configure(
+    const gz::sim::Entity& model,
+    const sdf::ElementConstPtr& sdf,
+    gz::sim::EntityComponentManager& ecm,
+    gz::sim::EventManager&) override;
+
+  void PostUpdate(const gz::sim::UpdateInfo& info, const gz::sim::EntityComponentManager& ecm) override;
+
+private:
+  enum GustState
+  {
+    kOn,
+    kOff,
+  };
+
+  // SDF parameters
+  std::string link_name_;
+
+  const cmp::WorldPose* pose_W_;
+  const cmp::WorldLinearVelocity* vel_W_;
+
+  tobas_gazebo_msgs::msg::WindParams params_;
+  ch::steady_clock::duration gust_state_change_time_;
+  GustState gust_state_ = kOff;
+  double gust_speed_ = 0.0;
+  DrydenSimulator dryden_;
+
+  ros2::PublisherPtr<tobas_msgs::Wind> wind_pub_;
+
+  ros2::ServiceServerPtr<GetSrv> get_params_ss_;
+  ros2::ServiceServerPtr<SetSrv> set_params_ss_;
+
+  void getSdfParams(const sdf::ElementConstPtr& sdf);
+
+  void getParamsCb(const GetSrv::Request::ConstSharedPtr& req, const GetSrv::Response::SharedPtr& res);
+  void setParamsCb(const SetSrv::Request::ConstSharedPtr& req, const SetSrv::Response::SharedPtr& res);
+};
+
+GazeboWindPlugin::GazeboWindPlugin()
+{
+}
+
+void GazeboWindPlugin::Configure(
+  const gz::sim::Entity& model,
+  const sdf::ElementConstPtr& sdf,
+  gz::sim::EntityComponentManager& ecm,
+  gz::sim::EventManager&)
+{
+  initialize("gazebo_wind_plugin", sdf);
+  getSdfParams(sdf);
+
+  // Initialize wind parameters.
+  params_.mean_speed = kDefaultMeanWindSpeed;
+  params_.direction = kDefaultConstantWindDirection;
+  params_.gust_speed_factor = kDefaultGustSpeedFactor;
+  params_.gust_duration = kDefaultGustDuration;
+  params_.gust_interval = kDefaultGustInterval;
+
+  const auto link = ecm.EntityByComponents(cmp::Link(), cmp::ParentEntity(model), cmp::Name(link_name_));
+  if (link == gz::sim::kNullEntity) {
+    TOBAS_EXIT("Failed to find specified link \"", link_name_, "\".");
+  }
+
+  pose_W_ = getComponent<cmp::WorldPose>(link, ecm);
+  vel_W_ = getComponent<cmp::WorldLinearVelocity>(link, ecm);
+
+  wind_pub_ = createPublisher<tobas_msgs::Wind>(kWindGtTopic);
+  get_params_ss_ = createService<GetSrv>(kGetWindParamsSrv, &self::getParamsCb, this);
+  set_params_ss_ = createService<SetSrv>(kSetWindParamsSrv, &self::setParamsCb, this);
+}
+
+void GazeboWindPlugin::PostUpdate(const gz::sim::UpdateInfo& info, const gz::sim::EntityComponentManager&)
+{
+  // Gust.
+  const auto t_gust = ch::duration<double>(info.simTime - gust_state_change_time_).count();  // [s]
+  switch (gust_state_) {
+    case kOn: {
+      if (t_gust > params_.gust_duration) {
+        gust_state_ = kOff;
+        gust_state_change_time_ = info.simTime;
+        break;
+      }
+
+      const auto max_gust_speed = params_.mean_speed * params_.gust_speed_factor;
+      gust_speed_ = 0.5 * max_gust_speed * (1 - std::cos(M_2PI * t_gust / params_.gust_duration));
+      break;
+    }
+    case kOff: {
+      if (t_gust > params_.gust_interval) {
+        gust_state_ = kOn;
+        gust_state_change_time_ = info.simTime;
+        break;
+      }
+
+      gust_speed_ = 0.0;
+      break;
+    }
+    default: {
+      TOBAS_EXIT("Invalid gust state: ", static_cast<int>(gust_state_));
+    }
+  }
+
+  // Steady wind, mean wind velocity plus gust.
+  const auto v_steady_wind = params_.mean_speed + gust_speed_;
+  const gz::math::Vector3d steady_W(
+    v_steady_wind * std::cos(params_.direction), v_steady_wind * std::sin(params_.direction), 0.0);
+
+  // Update the turbulence component.
+  const auto rel_wind_speed = (steady_W - vel_W_->Data()).Length();  // Relative velocity of steady wind.
+  const auto dt = ch::duration<double>(info.dt).count();
+  dryden_.update(rel_wind_speed, pose_W_->Data().Pos().Z(), dt);
+  const gz::math::Vector3d turb_B(dryden_.u(), dryden_.v(), dryden_.w());
+
+  // Compute the total wind velocity.
+  const auto wind_W = steady_W + pose_W_->Data().Rot().RotateVector(turb_B);
+
+  // Create the wind velocity message.
+  auto wind_msg = std::make_unique<tobas_msgs::Wind>();
+  wind_msg->header.frame_id = frame::kWorld;
+  vectorGazeboToKDL(wind_W, wind_msg->vel);
+
+  // Publish wind velocity.
+  wind_pub_->publish(std::move(wind_msg));
+}
+
+void GazeboWindPlugin::getSdfParams(const sdf::ElementConstPtr& sdf)
+{
+  getSdfParam(sdf, "linkName", link_name_);
+}
+
+void GazeboWindPlugin::getParamsCb(const GetSrv::Request::ConstSharedPtr&, const GetSrv::Response::SharedPtr& res)
+{
+  res->params = params_;
+}
+
+void GazeboWindPlugin::setParamsCb(const SetSrv::Request::ConstSharedPtr& req, const SetSrv::Response::SharedPtr& res)
+{
+  res->params = params_;
+
+  // Mean speed
+  if (req->params.mean_speed < 0) {
+    TOBAS_ERROR("Mean wind speed must be non-negative.");
+    res->success = false;
+  }
+  params_.mean_speed = res->params.mean_speed = req->params.mean_speed;
+
+  // Direction
+  params_.direction = res->params.direction = req->params.direction;
+
+  // Gust speed factor
+  if (req->params.gust_speed_factor > 0) {
+    params_.gust_speed_factor = res->params.gust_speed_factor = req->params.gust_speed_factor;
+  }
+  else {
+    TOBAS_WARN("Gust speed factor remains unchanged.");
+  }
+
+  // Gust duration
+  if (req->params.gust_duration > 0) {
+    params_.gust_duration = res->params.gust_duration = req->params.gust_duration;
+  }
+  else {
+    TOBAS_WARN("Gust duration remains unchanged.");
+  }
+
+  // Gust interval
+  if (req->params.gust_interval > 0) {
+    params_.gust_interval = res->params.gust_interval = req->params.gust_interval;
+  }
+  else {
+    TOBAS_WARN("Gust interval remains unchanged.");
+  }
+
+  // Update dryden wind model.
+  dryden_.setMeanWindSpeed(req->params.mean_speed);
+
+  res->success = true;
+  TOBAS_INFO("Wind parameters are updated.");
+}
+}  // namespace gazebo
+}  // namespace tobas
+
+GZ_ADD_PLUGIN(tobas::gazebo::GazeboWindPlugin, gz::sim::System, gz::sim::ISystemConfigure, gz::sim::ISystemPostUpdate)
