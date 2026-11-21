@@ -1,0 +1,120 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#include <tobas_constants/ros_interface.hpp>
+#include <tobas_node/node.hpp>
+#include <tobas_real_common/ros_interface.hpp>
+#include <tobas_ros2_tools/rate_manager.hpp>
+#include <tobas_ros2_tools/register.hpp>
+#include <tobas_tools/util.hpp>
+
+#include <tobas_msgs/msg/battery.hpp>
+#include <tobas_msgs/msg/engine_state.hpp>
+#include <tobas_msgs/msg/fluid_pressure.hpp>
+#include <tobas_msgs/msg/joint_state_array.hpp>
+#include <tobas_msgs/msg/rotor_state_array.hpp>
+#include <tobas_msgs/msg/sbus.hpp>
+#include <tobas_msgs_adapter/imu.hpp>
+#include <tobas_msgs_adapter/magnetic_field.hpp>
+#include <tobas_msgs_adapter/odometry_with_covariance_stamped.hpp>
+#include <tobas_msgs_adapter/rc_input.hpp>
+
+using namespace std::chrono_literals;
+
+namespace tobas
+{
+template <typename MsgType>
+class TopicThrottle
+{
+  static constexpr double kPublishRate = 25.0;  // [Hz]
+
+public:
+  explicit TopicThrottle() : rate_manager_(kPublishRate)
+  {
+  }
+
+  void initialize(rclcpp::Node::SharedPtr node, const std::string& topic)
+  {
+    node_ = node;
+    rate_manager_.reset();
+
+    pub_ = ros2::createPublisher<MsgType>(node, addThrotNS(topic));
+    sub_ = ros2::createSubscriber(node, topic, &TopicThrottle::callback, this);
+  }
+
+private:
+  rclcpp::Node::SharedPtr node_;
+  ros2::RateManager rate_manager_;
+
+  ros2::PublisherPtr<MsgType> pub_;
+  ros2::SubscriberPtr<MsgType> sub_;
+
+  void callback(const typename MsgType::ConstSharedPtr& msg_in)
+  {
+    // Thin out high-frequency topics to reduce network traffic.
+    // Use the node clock because PC-FC system clock differences can break the output rate
+    // when header timestamps are used.
+    if (!rate_manager_.update(node_->now())) {
+      return;
+    }
+
+    auto msg_out = std::make_unique<MsgType>(*msg_in);
+    pub_->publish(std::move(msg_out));
+  }
+};
+
+class TopicThrottleNode : public BaseNode
+{
+  using self = TopicThrottleNode;
+  using super = BaseNode;
+
+public:
+  explicit TopicThrottleNode(const rclcpp::NodeOptions& options = rclcpp::NodeOptions());
+
+  void initialize();
+
+private:
+  TopicThrottle<tobas_msgs::msg::Battery> battery_throttle_;
+  TopicThrottle<tobas_msgs::msg::EngineState> engine_state_throttle_;
+  TopicThrottle<tobas_msgs::msg::Sbus> sbus_throttle_;
+  TopicThrottle<tobas_msgs::RCInput> rcin_throttle_;
+  TopicThrottle<tobas_msgs::Imu> imu_throttle_;
+  TopicThrottle<tobas_msgs::MagneticField> mag_throttle_;
+  TopicThrottle<tobas_msgs::msg::FluidPressure> pres_throttle_;
+  TopicThrottle<tobas_msgs::msg::RotorStateArray> rotor_states_throttle_;
+  TopicThrottle<tobas_msgs::msg::JointStateArray> joint_states_throttle_;
+  TopicThrottle<tobas_msgs::OdometryWithCovarianceStamped> odom_throttle_;
+  TopicThrottle<tobas_msgs::Imu> real_imu_throttle_;
+  TopicThrottle<tobas_msgs::MagneticField> real_mag_throttle_;
+
+  ros2::TimerPtr initialize_timer_;
+};
+
+TopicThrottleNode::TopicThrottleNode(const rclcpp::NodeOptions& options)
+  : super("topic_throttle", nodeOptions_Default(options))
+{
+  initialize_timer_ = createTimer(0s, &self::initialize, this);
+}
+
+void TopicThrottleNode::initialize()
+{
+  const auto node = shared_from_this();
+
+  battery_throttle_.initialize(node, topic::kBattery);
+  engine_state_throttle_.initialize(node, topic::kEngineState);
+  sbus_throttle_.initialize(node, topic::kSbus);
+  rcin_throttle_.initialize(node, topic::kRcInput);
+  imu_throttle_.initialize(node, topic::kImuFilt);
+  mag_throttle_.initialize(node, topic::kMagneticField);
+  pres_throttle_.initialize(node, topic::kAirPressure);
+  rotor_states_throttle_.initialize(node, topic::kRotorStates);
+  joint_states_throttle_.initialize(node, topic::kJointStates);
+  odom_throttle_.initialize(node, topic::kOdometry);
+  real_imu_throttle_.initialize(node, real::topic::kImuRaw);
+  real_mag_throttle_.initialize(node, real::topic::kMagneticField);
+
+  initialize_timer_->cancel();
+}
+}  // namespace tobas
+
+RCLCPP_COMPONENTS_REGISTER_NODE(tobas::TopicThrottleNode)
