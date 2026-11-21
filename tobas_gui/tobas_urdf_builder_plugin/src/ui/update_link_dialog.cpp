@@ -9,18 +9,18 @@
 #include <QColorDialog>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QTabBar>
 #include <rclcpp/rclcpp.hpp>
 
 #include <tobas_ros2_tools/util.hpp>
 #include <tobas_std_tools/console.hpp>
-
-#include "ui_update_link_dialog.h"
 
 #include "tobas_urdf_builder_plugin/ui/double_map_input_dialog.hpp"
 #include "tobas_urdf_builder_plugin/ui/string_input_dialog.hpp"
 #include "tobas_urdf_builder_plugin/ui/urdf_builder_panel.hpp"
 #include "tobas_urdf_builder_plugin/utils/constants.hpp"
 #include "tobas_urdf_builder_plugin/utils/widget_item.hpp"
+#include "ui_update_link_dialog.h"
 
 namespace fs = std::filesystem;
 
@@ -41,6 +41,11 @@ UpdateLinkDialog::UpdateLinkDialog(rclcpp::Node::SharedPtr node, UrdfBuilderPane
   , link_vm_(new view_model::LinkViewModel())
 {
   ui_->setupUi(this);
+
+  // Keep all five tabs at a fixed width regardless of the dock width.
+  const auto tab_bar = ui_->TabWidget->tabBar();
+  tab_bar->setExpanding(false);
+  tab_bar->setStyleSheet("QTabBar::tab { width: 96px; }");
 
   // Hide unnecessary items.
   ui_->JointSafetyGroupBox->hide();
