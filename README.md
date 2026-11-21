@@ -1,53 +1,59 @@
-# tobas_inja_vendor
+![Tobas](./docs/docs/assets/brand/logo_black.png#gh-light-mode-only)
+![Tobas](./docs/docs/assets/brand/logo_white.png#gh-dark-mode-only)
 
-This package provides the header-only [inja](https://github.com/pantor/inja) template engine
-as an exported CMake interface target.
+[![Latest version](https://img.shields.io/github/v/release/TobasFlightControl/tobas)](https://github.com/TobasFlightControl/tobas/releases)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-## Vendored release
+Tobas is a Linux-based, model-based flight controller for drones and robotic aircraft.
+It designs control systems from each airframe's physical model,
+so unconventional aircraft can be simulated, configured, and flown through the same ROS 2 interface.
 
-- Upstream tag: [`v3.5.0`](https://github.com/pantor/inja/releases/tag/v3.5.0)
-- Upstream commit: `7d1b4600b68595085a949743331c2e5673f511ea`
-- Source archive SHA-256: `a5f0266673c59028eab6ceeddd8b862c70abfeb32fb7a5387c16bf46f3269ab2`
-- License: MIT; see `vendor/inja/LICENSE`
+## Quick Links
 
-Only the public headers under `include/inja` are vendored.
-The upstream copy of nlohmann/json is intentionally omitted;
-this package uses the `nlohmann-json-dev` rosdep key instead.
+| Purpose                  | Document                                                                                              |
+| ------------------------ | ----------------------------------------------------------------------------------------------------- |
+| Use Tobas                | [Tobas User Guide](https://tobasflightcontrol.github.io/tobas/latest/)                                |
+| Install Tobas            | [Installation Guide](https://tobasflightcontrol.github.io/tobas/latest/getting_started/installation/) |
+| Build from source        | [Setup](./SETUP.md)                                                                                   |
+| Contribute changes       | [Contributing to Tobas](./CONTRIBUTING.md)                                                            |
+| Edit the documentation   | [Documentation README](./docs/README.md)                                                              |
+| Review licensing options | [Commercial License](./COMMERCIAL-LICENSE.md)                                                         |
 
-## Updating the vendored source
+## Supported Platform
 
-1. Find the latest stable tag on the [upstream releases page](https://github.com/pantor/inja/releases/latest),
-   and set `UPSTREAM_TAG` below to that exact tag.
+- Ubuntu 24.04 LTS
+- ROS 2 Jazzy
+- Debian Trixie for flight-controller images
 
-2. From this package directory, download and extract the corresponding source archive:
+## Repository Layout
 
-   ```bash
-   UPSTREAM_TAG=v3.5.0
-   UPDATE_DIR=$(mktemp -d)
-   curl -L \
-     -o "${UPDATE_DIR}/inja-${UPSTREAM_TAG}.tar.gz" \
-     "https://github.com/pantor/inja/archive/refs/tags/${UPSTREAM_TAG}.tar.gz"
-   tar -xzf "${UPDATE_DIR}/inja-${UPSTREAM_TAG}.tar.gz" -C "${UPDATE_DIR}"
-   sha256sum "${UPDATE_DIR}/inja-${UPSTREAM_TAG}.tar.gz"
-   ```
+- `docs`: MkDocs-based user and developer documentation.
+- `tobas_core`: Core flight-control, estimation, hardware, message, failsafe, and utility packages.
+- `tobas_gui`: Setup, ground-station, simulation, tuning, and visualization tools.
+- `tobas_examples`: Example packages and code-style references.
+- `tobas_dev_tools`: Development, synchronization, and deployment helper scripts.
+- `tobas_deb`: Debian packaging resources for supported images.
+- `tobas_external`: Third-party libraries wrapped for the Tobas workspace.
 
-3. Replace the public headers and license. Do not copy `third_party/include/nlohmann`:
+## For Contributors
 
-   ```bash
-   UPSTREAM_DIR="${UPDATE_DIR}/inja-${UPSTREAM_TAG#v}"
-   rsync -a --delete "${UPSTREAM_DIR}/include/inja/" vendor/inja/include/inja/
-   install -m 0644 "${UPSTREAM_DIR}/LICENSE" vendor/inja/LICENSE
-   ```
+See [Contributing to Tobas](./CONTRIBUTING.md) for source setup, code style, pre-commit checks, and Git guidelines.
 
-4. Update the tag, commit, and archive SHA-256 in the **Vendored release** section. Obtain the tag commit with:
+## License
 
-   ```bash
-   git ls-remote https://github.com/pantor/inja.git "refs/tags/${UPSTREAM_TAG}" "refs/tags/${UPSTREAM_TAG}^{}"
-   ```
+Unless otherwise noted, this repository is licensed under the GNU General Public License,
+version 3 or any later version (GPL-3.0-or-later).
 
-5. Review the upstream changes and license, then validate the package and its consumers:
+The `*_msgs` packages, including their `.msg`, `.srv`, and `.action` files,
+are licensed under Apache-2.0.
 
-   ```bash
-   pre-commit run --files CMakeLists.txt package.xml README.md
-   colcon build --packages-up-to tobas_setup_assistant tobas_bootmedia_config
-   ```
+See [LICENSE](./LICENSE) for the default open source license,
+and [LICENSES/Apache-2.0.txt](./LICENSES/Apache-2.0.txt) for the Apache-2.0 license text.
+
+If you want to distribute Tobas as part of a proprietary product,
+or if you do not wish to comply with the GPL for distribution,
+alternative commercial licensing is available from Tobas.
+
+See [COMMERCIAL-LICENSE.md](./COMMERCIAL-LICENSE.md) for commercial licensing information.
+
+For commercial licensing inquiries, please contact: contact@tobas.jp
