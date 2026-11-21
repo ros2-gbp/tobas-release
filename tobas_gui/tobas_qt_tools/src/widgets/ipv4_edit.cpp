@@ -8,8 +8,9 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-#include <tobas_qt_tools/validator/int_validator.hpp>
 #include <tobas_std_tools/check.hpp>
+
+#include "tobas_qt_tools/validator/int_validator.hpp"
 
 namespace tobas
 {
@@ -18,6 +19,7 @@ namespace qt
 IPv4Edit::IPv4Edit(QWidget* parent) : super(parent)
 {
   const auto cols = new QHBoxLayout();
+  cols->setContentsMargins(0, 0, 0, 0);
   setLayout(cols);
 
   for (int i = kNumFields - 1; i >= 0; --i) {
