@@ -1,0 +1,42 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+// Copyright (C) 2026 Tobas, Inc.
+
+#include "tobas_quadprog/utils.hpp"
+
+#include <tobas_eigen_tools/core.hpp>
+
+using namespace std;
+using namespace Eigen;
+
+namespace tobas
+{
+namespace quadprog
+{
+void matIneqFromRange(const VectorXd& lb, const VectorXd& ub, MatrixXd& A, VectorXd& b, const double inf)
+{
+  assert(lb.rows() == ub.rows());
+  assert(((ub - lb).array() >= 0.0).all());
+
+  const auto size = lb.rows();
+
+  const MatrixXd E = MatrixXd::Identity(size, size);
+  const auto left = eigen::concat(-E, E, 0);
+  const auto right = eigen::concat(-lb, ub, 0);
+  const auto is_valid = (right.array().abs() < inf).eval();
+  const auto num_valid = is_valid.count();
+
+  A.conservativeResize(num_valid, size);
+  b.conservativeResize(num_valid);
+
+  int row = 0;  // Matrix inequality row index.
+  for (int i = 0; i < size * 2; ++i) {
+    if (!is_valid(i)) {
+      continue;
+    }
+    A.block(row, 0, 1, size) = left.row(i);
+    b(row) = right(i);
+    ++row;
+  }
+}
+}  // namespace quadprog
+}  // namespace tobas
