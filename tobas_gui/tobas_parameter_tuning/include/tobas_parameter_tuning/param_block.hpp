@@ -3,9 +3,10 @@
 
 #pragma once
 
+#include <yaml-cpp/yaml.h>
+
 #include <filesystem>
 
-#include <yaml-cpp/yaml.h>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
@@ -55,8 +56,8 @@ class ParamBlockWidget : public QWidget
   using super = QWidget;
 
   static constexpr int kLabelPSize = 12;
-  static constexpr int kParamNameWidth = 250;
-  static constexpr int kLineEditWidth = 150;
+  static constexpr int kParamNameWidth = 256;
+  static constexpr int kLineEditWidth = 128;
 
 public:
   explicit ParamBlockWidget(rclcpp::Node::SharedPtr node, const std::string& node_name, const QString& label);
