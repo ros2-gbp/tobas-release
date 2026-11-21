@@ -1,59 +1,32 @@
-![Tobas](./docs/docs/assets/brand/logo_black.png#gh-light-mode-only)
-![Tobas](./docs/docs/assets/brand/logo_white.png#gh-dark-mode-only)
+# tobas_gazebo_sim
 
-[![Latest version](https://img.shields.io/github/v/release/TobasFlightControl/tobas)](https://github.com/TobasFlightControl/tobas/releases)
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+## Notes
 
-Tobas is a Linux-based, model-based flight controller for drones and robotic aircraft.
-It designs control systems from each airframe's physical model,
-so unconventional aircraft can be simulated, configured, and flown through the same ROS 2 interface.
+### Documentation
 
-## Quick Links
+- [Gazebo Tutorials/SDF worlds](https://gazebosim.org/docs/latest/sdf_worlds/)
 
-| Purpose                  | Document                                                                                              |
-| ------------------------ | ----------------------------------------------------------------------------------------------------- |
-| Use Tobas                | [Tobas User Guide](https://tobasflightcontrol.github.io/tobas/latest/)                                |
-| Install Tobas            | [Installation Guide](https://tobasflightcontrol.github.io/tobas/latest/getting_started/installation/) |
-| Build from source        | [Setup](./SETUP.md)                                                                                   |
-| Contribute changes       | [Contributing to Tobas](./CONTRIBUTING.md)                                                            |
-| Edit the documentation   | [Documentation README](./docs/README.md)                                                              |
-| Review licensing options | [Commercial License](./COMMERCIAL-LICENSE.md)                                                         |
+### Example World Files
 
-## Supported Platform
+- [gz-sim](https://github.com/gazebosim/gz-sim/tree/ign-gazebo3/examples/worlds)
+- [Fuel Latest Worlds](https://app.gazebosim.org/fuel/worlds)
+  - OpenRobotics models often download meshes separately, so the files themselves can stay lightweight
+- [Gazebo Worlds | PX4](https://docs.px4.io/main/en/sim_gazebo_gz/worlds.html)
 
-- Ubuntu 24.04 LTS
-- ROS 2 Jazzy
-- Debian Trixie for flight-controller images
+### URI Specification from Packages
 
-## Repository Layout
+```xml
+<include>
+  <uri>package://${package_name}/models/${model_name}</uri>
+</include>
+```
 
-- `docs`: MkDocs-based user and developer documentation.
-- `tobas_core`: Core flight-control, estimation, hardware, message, failsafe, and utility packages.
-- `tobas_gui`: Setup, ground-station, simulation, tuning, and visualization tools.
-- `tobas_examples`: Example packages and code-style references.
-- `tobas_dev_tools`: Development, synchronization, and deployment helper scripts.
-- `tobas_deb`: Debian packaging resources for supported images.
-- `tobas_external`: Third-party libraries wrapped for the Tobas workspace.
+The path must be set correctly in `dsv.in`.
 
-## For Contributors
+### Download from Fuel, a model-sharing site for Gazebo
 
-See [Contributing to Tobas](./CONTRIBUTING.md) for source setup, code style, pre-commit checks, and Git guidelines.
-
-## License
-
-Unless otherwise noted, this repository is licensed under the GNU General Public License,
-version 3 or any later version (GPL-3.0-or-later).
-
-The `*_msgs` packages, including their `.msg`, `.srv`, and `.action` files,
-are licensed under Apache-2.0.
-
-See [LICENSE](./LICENSE) for the default open source license,
-and [LICENSES/Apache-2.0.txt](./LICENSES/Apache-2.0.txt) for the Apache-2.0 license text.
-
-If you want to distribute Tobas as part of a proprietary product,
-or if you do not wish to comply with the GPL for distribution,
-alternative commercial licensing is available from Tobas.
-
-See [COMMERCIAL-LICENSE.md](./COMMERCIAL-LICENSE.md) for commercial licensing information.
-
-For commercial licensing inquiries, please contact: contact@tobas.jp
+```xml
+<include>
+  <uri>https://fuel.ignitionrobotics.org/1.0/openrobotics/models/Sonoma Raceway</uri>
+</include>
+```
