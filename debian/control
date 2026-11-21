@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-geographic
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), libgeographiclib-dev, pkg-config, ros-jazzy-ament-cmake, ros-jazzy-ament-index-cpp, ros-jazzy-tobas-std-tools, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_geographic/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-geographic
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, libgeographiclib-dev, ros-jazzy-ament-index-cpp, ros-jazzy-tobas-std-tools, ros-jazzy-ros-workspace
+Description: Geographic coordinate and geomagnetic field calculations backed by GeographicLib.
