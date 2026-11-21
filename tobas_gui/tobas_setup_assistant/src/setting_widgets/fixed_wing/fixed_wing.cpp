@@ -3,10 +3,7 @@
 
 #include "tobas_setup_assistant/setting_tabs/fixed_wing/fixed_wing.hpp"
 
-#include <QVBoxLayout>
-
-#include <tobas_gui_common/constants.hpp>
-#include <tobas_qt_tools/widgets/label.hpp>
+#include <tobas_qt_tools/widgets/tab_widget.hpp>
 
 namespace tobas
 {
@@ -18,20 +15,17 @@ namespace fw
 {
 FixedWingWidget::FixedWingWidget(rclcpp::Node::SharedPtr node, const uadf::Model& uadf) : node_(node)
 {
-  // Vehicle
-  addWidget(new qt::Label(kVehicleLabel, cmn::kTitlePSize));
   vehicle_ = new VehicleParametersWidget();
-  addWidget(vehicle_);
-
-  // Aerodynamic Coefficients
-  addWidget(new qt::Label(kAeroCoefsLabel, cmn::kTitlePSize));
   aero_coefs_ = new AerodynamicsCoefficientsWidget(node_);
-  addWidget(aero_coefs_);
-
-  // Control Surfaces
-  addWidget(new qt::Label(kControlSurfacesLabel, cmn::kTitlePSize));
   control_surfaces_ = new ControlSurfacesWidget(uadf);
-  addWidget(control_surfaces_);
+
+  const auto tabs = new qt::TabWidget();
+  tabs->setTabWidth(200);
+  tabs->enableWheelEvent(false);
+  tabs->addTab(vehicle_, kVehicleLabel);
+  tabs->addTab(aero_coefs_, kAeroCoefsLabel);
+  tabs->addTab(control_surfaces_, kControlSurfacesLabel);
+  addWidget(tabs, 1);
 }
 
 const char* FixedWingWidget::name() const
