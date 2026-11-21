@@ -4,13 +4,9 @@
 #pragma once
 
 #include <yaml-cpp/yaml.h>
-#include <QLabel>
+
 #include <QVBoxLayout>
-
-#include <tobas_qt_tools/widgets/description_widget.hpp>
-#include <tobas_qt_tools/widgets/scroll_area.hpp>
-
-#include "../param_getters/base.hpp"
+#include <QWidget>
 
 namespace tobas
 {
@@ -18,12 +14,12 @@ namespace gui
 {
 namespace sa
 {
-class BaseSettingWidget : public qt::ScrollArea
+class BaseSettingWidget : public QWidget
 {
   Q_OBJECT
 
   using self = BaseSettingWidget;
-  using super = qt::ScrollArea;
+  using super = QWidget;
 
 public:
   explicit BaseSettingWidget();
@@ -52,14 +48,7 @@ protected:
   void addSpacing(int size);
 
 private:
-  QLabel* title_;
-  qt::DescriptionWidget* description_;
-
-  QVBoxLayout* header_rows_;
   QVBoxLayout* content_rows_;
-
-private Q_SLOTS:
-  void initialize();
 };
 }  // namespace sa
 }  // namespace gui

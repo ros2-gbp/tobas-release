@@ -44,6 +44,7 @@ ParameterTuningWidget::ParameterTuningWidget(rclcpp::Node::SharedPtr node)
 
   // Layout
   const auto root_rows = new QVBoxLayout();
+  root_rows->setContentsMargins(0, 0, 0, 0);
   setLayout(root_rows);
 
   const auto button_cols = new QHBoxLayout();
@@ -51,13 +52,13 @@ ParameterTuningWidget::ParameterTuningWidget(rclcpp::Node::SharedPtr node)
   button_cols->addWidget(load_button_);
   button_cols->addWidget(save_button_);
   button_cols->addWidget(reset_button_);
-  button_cols->addStretch();
+  button_cols->addStretch(1);
 
   const auto param_rows = qt::createScrollableQVBoxLayout(root_rows);
   for (const auto& block : blocks_) {
     param_rows->addWidget(block);
   }
-  param_rows->addStretch();
+  param_rows->addStretch(1);
 
   // Connection
   connect(load_button_, &QPushButton::clicked, this, &self::onLoadButtonClicked);
