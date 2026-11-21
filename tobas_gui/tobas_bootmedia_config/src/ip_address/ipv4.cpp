@@ -6,6 +6,8 @@
 #include <tobas_qt_tools/layouts/form_layout.hpp>
 #include <tobas_qt_tools/message.hpp>
 
+#include "tobas_bootmedia_config/constants.hpp"
+
 namespace tobas
 {
 namespace gui
@@ -15,6 +17,7 @@ namespace bm
 IPv4Widget::IPv4Widget(const QString& name) : name_(name)
 {
   const auto form = new qt::FormLayout();
+  form->setHorizontalSpacing(kFormSpacing);
   setLayout(form);
 
   method_ = new qt::ComboBox();
