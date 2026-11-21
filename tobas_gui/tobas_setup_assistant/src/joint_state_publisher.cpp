@@ -25,7 +25,10 @@ JointStatePublisherWidget::JointStatePublisherWidget(
   const kdl::Tree& tree)
   : node_(node), uadf_(uadf), tree_(tree), rnd_gen_(rnd_dev_())
 {
-  slider_rows_ = new QVBoxLayout();
+  slider_rows_ = new QGridLayout();
+  slider_rows_->setAlignment(Qt::AlignTop);
+  slider_rows_->setColumnStretch(0, 1);
+  slider_rows_->setColumnStretch(1, 1);
 
   const auto scroll_area = new qt::ScrollArea();
   scroll_area->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
@@ -35,10 +38,6 @@ JointStatePublisherWidget::JointStatePublisherWidget(
   const auto center_button = new QPushButton("Center");
   const auto random_button = new QPushButton("Random");
 
-  zero_button->setFixedHeight(kButtonHeight);
-  center_button->setFixedHeight(kButtonHeight);
-  random_button->setFixedHeight(kButtonHeight);
-
   // Layout
   const auto button_cols = new QHBoxLayout();
   button_cols->addWidget(zero_button);
@@ -46,6 +45,7 @@ JointStatePublisherWidget::JointStatePublisherWidget(
   button_cols->addWidget(random_button);
 
   const auto rows = new QVBoxLayout();
+  rows->setContentsMargins(0, 0, 0, 0);
   rows->addWidget(scroll_area);
   rows->addLayout(button_cols);
 
@@ -109,13 +109,12 @@ void JointStatePublisherWidget::updateInternalDataStructures()
         std::bind(&self::onValueChanged, this, std::placeholders::_1, joint.name));
 
       sliders_.push_back(slider);
-      slider_rows_->addWidget(slider);
+      const auto index = static_cast<int>(sliders_.size()) - 1;
+      slider_rows_->addWidget(slider, index / 2, index % 2);
 
       qInfo().nospace() << QString::fromStdString(joint.name) << "was added to the JSP slider.";
     }
   }
-
-  slider_rows_->addStretch();
 
   // Start to publish joint states.
   publish_timer_.start(100);
