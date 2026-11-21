@@ -9,14 +9,15 @@
 
 #include <tobas_eigen_tools/ellipsoid.hpp>
 #include <tobas_ros2_tools/register.hpp>
+#include <tobas_ros2_tools/sync_service_client.hpp>
 #include <tobas_rqt_bridge/bridge.hpp>
 #include <tobas_rviz_wrapper/rviz.hpp>
 
 #include <geometry_msgs/msg/point_stamped.hpp>
 #include <sensor_msgs/msg/point_cloud.hpp>
-#include <tobas_real_msgs/srv/set_magnetometer_params.hpp>
-#include <tobas_ros2_tools/sync_service_client.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
+
+#include <tobas_real_msgs/srv/set_magnetometer_params.hpp>
 
 #include "../base.hpp"
 #include "./face_circle.hpp"
@@ -41,7 +42,7 @@ class CompleteMagCalibWidget : public BaseMagCalibWidget
   static constexpr char kEllipsoidTopic[] = "rviz/mag_calibration/ellipsoid";
   static constexpr int kMinDataSize = 500;
   static constexpr int kMaxDataSize = 10000;  // RViz limits the maximum to 100000.
-  static constexpr int kButtonWidth = 100;
+  static constexpr int kButtonWidth = 120;
   static constexpr int kButtonHeight = 40;
   static constexpr double kRvizPointScale = 10.0;
   static constexpr double kMinYawRate = M_PI / 30;     // [rad/s]
