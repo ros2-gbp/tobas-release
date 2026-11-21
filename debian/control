@@ -1,0 +1,12 @@
+Source: ros-jazzy-tobas-debug-msgs-adapter
+Section: misc
+Priority: optional
+Maintainer: "Masayoshi Dohi" <m.dohi@tobas.jp>
+Build-Depends: debhelper (>= 9.0.0), ros-jazzy-ament-cmake, ros-jazzy-tobas-debug-msgs, ros-jazzy-tobas-eigen-msgs-adapter, ros-jazzy-tobas-kdl-msgs-adapter, ros-jazzy-ros-workspace
+Homepage: https://index.ros.org/p/tobas_debug_msgs_adapter/#jazzy
+Standards-Version: 3.9.2
+
+Package: ros-jazzy-tobas-debug-msgs-adapter
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-jazzy-tobas-debug-msgs, ros-jazzy-tobas-eigen-msgs-adapter, ros-jazzy-tobas-kdl-msgs-adapter, ros-jazzy-ros-workspace
+Description: ROS 2 type adapters for Tobas controller and observer debug messages.
