@@ -20,6 +20,7 @@ namespace sim
 DynamicConfigWidget::DynamicConfigWidget(rclcpp::Node::SharedPtr node)
 {
   const auto rows = new QVBoxLayout();
+  rows->setContentsMargins(0, 0, 0, 0);
   setLayout(rows);
 
   const auto title = new qt::Label("Dynamic Configurations", cmn::kTitlePSize, QFont::Bold);
@@ -33,7 +34,7 @@ DynamicConfigWidget::DynamicConfigWidget(rclcpp::Node::SharedPtr node)
   suspended_load_ = new SuspendedLoadWidget(node);
   scroll_rows->addWidget(suspended_load_);
 
-  scroll_rows->addStretch();
+  scroll_rows->addStretch(1);
 }
 
 void DynamicConfigWidget::updateNamespace(const std::string& ns)
