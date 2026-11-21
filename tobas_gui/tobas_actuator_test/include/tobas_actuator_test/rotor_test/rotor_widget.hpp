@@ -5,6 +5,7 @@
 
 #include <qwt/qwt_slider.h>
 #include <qwt/qwt_thermo.h>
+
 #include <QLabel>
 
 #include <tobas_qt_tools/widgets/framed_label.hpp>
@@ -22,7 +23,7 @@ class RotorWidget : public QWidget
   using self = RotorWidget;
   using super = QWidget;
 
-  static constexpr int kPipeWidth = 50;
+  static constexpr int kPipeWidth = 48;
   static constexpr int kMinRotorCtrlGain = 0;
   static constexpr int kMaxRotorCtrlGain = 30;
 
