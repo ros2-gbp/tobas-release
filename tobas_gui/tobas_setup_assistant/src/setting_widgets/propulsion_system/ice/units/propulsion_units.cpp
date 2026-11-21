@@ -3,10 +3,16 @@
 
 #include "tobas_setup_assistant/setting_tabs/propulsion_system/ice/propulsion_units/propulsion_units.hpp"
 
+#include <algorithm>
+
+#include <QFontMetrics>
+
 #include <tobas_qt_tools/cast.hpp>
 #include <tobas_qt_tools/message.hpp>
 #include <tobas_qt_tools/stream.hpp>
 #include <tobas_yaml_tools/convert/qstring.hpp>
+
+#include "tobas_setup_assistant/setting_tabs/propulsion_system/constants.hpp"
 
 namespace tobas
 {
@@ -21,16 +27,18 @@ namespace ice
 PropulsionUnitsWidget::PropulsionUnitsWidget(rclcpp::Node::SharedPtr node, const uadf::Model& uadf)
   : node_(node), uadf_(uadf)
 {
-  setTabSize(kTabWidth, kTabHeight);
 }
 
 void PropulsionUnitsWidget::updateInternalDataStructures()
 {
   removeAllTabs();
+  const auto metrics = tabBar()->fontMetrics();
+  int max_text_width = 0;
 
   for (const auto& [joint_name, _] : uadf_.thrusts) {
     // Get propeller link names.
     const auto link_name = QString::fromStdString(uadf_.urdf->getJoint(joint_name)->child_link_name);
+    max_text_width = std::max(max_text_width, metrics.horizontalAdvance(link_name));
 
     // Add the tab.
     const auto link_widget = new PropulsionUnitWidget(node_);
@@ -43,6 +51,8 @@ void PropulsionUnitsWidget::updateInternalDataStructures()
       this,
       std::bind(&self::onCopyToAllButtonClicked, this, link_name));
   }
+  const auto tab_width = max_text_width + 2 * kLinkNameTabHorizontalPadding;
+  setTabWidth((tab_width + kLinkNameTabWidthStep - 1) / kLinkNameTabWidthStep * kLinkNameTabWidthStep);
 }
 
 bool PropulsionUnitsWidget::isValid()
