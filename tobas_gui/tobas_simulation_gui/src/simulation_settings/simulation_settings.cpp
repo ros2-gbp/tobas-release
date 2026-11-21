@@ -20,6 +20,7 @@ namespace sim
 SimulationSettingsWidget::SimulationSettingsWidget(rclcpp::Node::SharedPtr node)
 {
   const auto rows = new QVBoxLayout();
+  rows->setContentsMargins(0, 0, 0, 0);
   setLayout(rows);
 
   const auto title = new qt::Label("Simulation Settings", cmn::kTitlePSize, QFont::Bold);
@@ -42,7 +43,7 @@ SimulationSettingsWidget::SimulationSettingsWidget(rclcpp::Node::SharedPtr node)
   debug_ = new DebugWidget();
   scroll_rows->addWidget(debug_);
 
-  scroll_rows->addStretch();
+  scroll_rows->addStretch(1);
 }
 
 LoopType SimulationSettingsWidget::loopType() const
