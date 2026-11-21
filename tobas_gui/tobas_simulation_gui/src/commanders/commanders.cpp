@@ -24,6 +24,7 @@ CommandersWidget::CommandersWidget(
   const Drone& drone)
 {
   const auto rows = new QVBoxLayout();
+  rows->setContentsMargins(0, 0, 0, 0);
   setLayout(rows);
 
   const auto title = new qt::Label("Commanders", cmn::kTitlePSize, QFont::Bold);
@@ -37,7 +38,7 @@ CommandersWidget::CommandersWidget(
   joint_commander_ = new JointCommanderWidget(node, tree, drone);
   scroll_rows->addWidget(joint_commander_);
 
-  scroll_rows->addStretch();
+  scroll_rows->addStretch(1);
 }
 
 void CommandersWidget::updateInternalDataStructures()
